@@ -1,0 +1,8 @@
+.openai/
+**/.openai/
+scout/preview.png
+*-deploy.tar.gz
+.env
+.env.*
+!.env.example
+node_modules/
