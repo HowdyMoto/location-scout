@@ -1,43 +1,105 @@
 'use strict';
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const layers=[
-{id:'air',name:'Aircraft',icon:'✈',color:'#9c78cd',demo:true},
-{id:'sea',name:'Vessels',icon:'⛵',color:'#409ab4',demo:true},
-{id:'transit',name:'Public transit',icon:'▣',color:'#c68c52',demo:true},
-{id:'fire',name:'Fire & rescue',icon:'♨',color:'#cd7374',source:'Seattle Fire Department',url:'https://data.seattle.gov/Public-Safety/Seattle-Real-Time-Fire-911-Calls/kzjm-xkqj'},
-{id:'weather',name:'Weather alerts',icon:'☁',color:'#7392ac',source:'National Weather Service',url:'https://www.weather.gov/documentation/services-web-api'},
-{id:'quake',name:'Earthquakes',icon:'◉',color:'#ae9670',source:'USGS · past 24 hours',url:'https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php'},
-{id:'power',name:'Power outages',icon:'ϟ',color:'#bd9a49',demo:true}
-].map(l=>({...l,on:true,status:l.demo?'Simulated examples':'Connecting…',items:[],group:L.layerGroup()}));
-const map=L.map('map',{zoomControl:false}).setView([47.61,-122.37],11);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const home = {center:[37.82,-122.25],zoom:10,name:'San Francisco Bay Area'};
+const map = L.map('map',{zoomControl:false}).setView(home.center,home.zoom);
 L.control.zoom({position:'topright'}).addTo(map);
-let dark=false,selected=null,refreshing=false,toastTimer;
-let tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map);
-tiles.on('tileerror',()=>{$('refresh-status').textContent='Some map tiles unavailable. Check your connection.'});
-function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',4000)}
-function ago(t){if(!t)return'Time not supplied';const n=Math.max(0,Math.floor((Date.now()-t)/60000));return n<1?'Just now':n<60?`${n}m ago`:n<1440?`${Math.floor(n/60)}h ago`:`${Math.floor(n/1440)}d ago`}
-function enabled(l){return l.on&&(!l.demo||$('demo').checked)}
-function renderControls(){ $('layers').innerHTML=layers.map(l=>`<div class="layer"><span class="layer-icon" style="--color:${l.color}">${l.icon}</span><div class="layer-info"><strong>${l.name}</strong><small>${esc(l.status)}</small></div><label class="switch"><input type="checkbox" data-layer="${l.id}" aria-label="${l.name}" ${l.on?'checked':''}><span></span></label></div>`).join('');document.querySelectorAll('[data-layer]').forEach(e=>e.onchange=()=>{layers.find(l=>l.id===e.dataset.layer).on=e.checked;sync()}); }
-function details(l,item){selected={l,item};$('detail').hidden=false;$('detail').innerHTML=`<button class="close" aria-label="Close details">×</button><div class="detail-status">${l.demo?'SIMULATED EXAMPLE':l.failed?'LAST KNOWN · FEED UNAVAILABLE':'PUBLIC OBSERVATION'}</div><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p><p>${l.demo?'Fictional scenario · not a current event':`Observed: ${esc(item.time?new Date(item.time).toLocaleString():'Time not supplied')}<br>Fetched: ${esc(l.fetched?new Date(l.fetched).toLocaleTimeString():'Unavailable')}`}</p><p>${esc(l.demo?'Demo data':l.source)}<br>${item.lat.toFixed(4)}°, ${item.lon.toFixed(4)}°</p>${l.demo?'':`<a href="${esc(l.url)}" target="_blank" rel="noopener">View original source ↗</a>`}`;$('detail').querySelector('.close').onclick=()=>{$('detail').hidden=true;selected=null};}
-function draw(l){l.group.clearLayers();for(const item of l.items){const icon=L.divIcon({className:'signal',html:`<span class="marker ${l.demo?'demo':''}" style="--color:${l.color}">${l.icon}</span>`,iconSize:[30,30],iconAnchor:[15,15]});const m=L.marker([item.lat,item.lon],{icon,title:`${item.title}${l.demo?' (simulated)':''}`}).on('click',()=>details(l,item)).addTo(l.group);item.marker=m;if(item.geometry)L.geoJSON(item.geometry,{style:{color:l.color,weight:1,fillOpacity:.12}}).on('click',()=>details(l,item)).addTo(l.group);if(l.demo&&l.id==='air')L.polyline([[item.lat-.025,item.lon-.012],[item.lat,item.lon]],{color:l.color,weight:1.5,opacity:.45,dashArray:'3 4'}).addTo(l.group);}}
-function visible(){const bounds=map.getBounds();return layers.filter(enabled).flatMap(l=>l.items.filter(i=>bounds.contains([i.lat,i.lon])||(i.geometry&&L.geoJSON(i.geometry).getBounds().isValid()&&bounds.intersects(L.geoJSON(i.geometry).getBounds()))).map(item=>({l,item})));}
-function feed(){const items=visible().sort((a,b)=>Number(a.l.demo)-Number(b.l.demo)||(b.item.time||0)-(a.item.time||0));$('signal-count').textContent=items.length;$('visible-count').textContent=`${items.length} signals in view`;$('layer-count').textContent=layers.filter(enabled).length;$('feed').innerHTML=items.length?items.slice(0,12).map(({l,item},n)=>`<button class="feed-item" data-index="${n}"><span class="layer-icon" style="--color:${l.color}">${l.icon}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.summary||l.name)}</small><span class="badge">${l.demo?'DEMO · SIMULATED':`${l.failed?'STALE · ':''}${ago(item.time)}`}</span></span></button>`).join(''):'<p class="empty">No signals in this view.<br>Zoom out, enable a layer, or return to Seattle to explore the demo.</p>';document.querySelectorAll('[data-index]').forEach(b=>b.onclick=()=>{const {l,item}=items[+b.dataset.index];map.panTo([item.lat,item.lon]);details(l,item)});}
-function sync(){for(const l of layers){if(enabled(l))l.group.addTo(map);else map.removeLayer(l.group)}if(selected&&!enabled(selected.l)){$('detail').hidden=true;selected=null}feed()}
-function demo(){const samples={air:[[47.67,-122.36,'SC 204 · arriving','Sample flight approaching Seattle · 4,200 ft'],[47.55,-122.31,'SC 718 · departing','Sample departure · 8,500 ft'],[47.72,-122.25,'SC 112 · northbound','Sample aircraft · 12,300 ft'],[47.50,-122.44,'SC 305 · inbound','Sample approach · 6,100 ft'],[47.63,-122.49,'SC 901 · westbound','Sample aircraft · 9,700 ft']],sea:[[47.61,-122.42,'Ferry · crossing the Sound','Sample passenger ferry · 14 knots'],[47.58,-122.37,'Cargo vessel · harbor arrival','Sample cargo vessel · 6 knots'],[47.66,-122.43,'Sailing vessel','Sample sailboat · 5 knots'],[47.54,-122.47,'Ferry · southbound','Sample passenger ferry · 12 knots'],[47.69,-122.40,'Tug · in transit','Sample tugboat · 8 knots']],transit:[[47.61,-122.33,'Route 40 · downtown','Sample bus · next stop in 3 minutes'],[47.65,-122.35,'Route 62 · Fremont','Sample bus · on schedule'],[47.58,-122.32,'Link · southbound','Sample train · next stop in 2 minutes'],[47.67,-122.31,'Route 44 · University District','Sample bus · 4 minutes behind'],[47.62,-122.30,'Route 8 · Capitol Hill','Sample bus · on schedule']],power:[[47.64,-122.37,'Example outage area','Fictional outage · 240 customers · not a real report'],[47.56,-122.29,'Example service interruption','Fictional outage · 85 customers · not a real report']]};for(const l of layers.filter(l=>l.demo)){l.items=samples[l.id].map(([lat,lon,title,description])=>({lat,lon,title,description,summary:description}));draw(l)}}
-async function json(url){const r=await fetch(url,{signal:AbortSignal.timeout(18000)});if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json()}
-async function refresh(){if(refreshing)return;refreshing=true;$('refresh').disabled=true;$('refresh-status').textContent='Checking public feeds…';await Promise.allSettled(layers.filter(l=>!l.demo).map(async l=>{try{let items;if(l.id==='quake'){const d=await json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');items=d.features.map(f=>({lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],title:`M ${f.properties.mag} · ${f.properties.place}`,description:`Magnitude ${f.properties.mag} earthquake · depth ${f.geometry.coordinates[2]} km. Preliminary observations may be revised.`,time:f.properties.time,summary:'Earthquake · USGS'}));}else if(l.id==='fire'){const since=new Date(Date.now()-2*86400000).toISOString().slice(0,19);const url='https://data.seattle.gov/resource/kzjm-xkqj.json?'+new URLSearchParams({'$limit':'1000','$order':'datetime DESC','$where':`datetime > '${since}'`});const d=await json(url);items=d.filter(x=>x.latitude&&x.longitude).map(x=>({lat:+x.latitude,lon:+x.longitude,title:x.type||'Fire / rescue dispatch',description:`${x.address||'Seattle'} · Incident ${x.incident_number||'not supplied'}. Published dispatch, not a confirmed ongoing emergency. Source timestamp is Seattle local time.`,summary:x.address||'Seattle Fire Department',time:parseSeattleTime(x.datetime)}));}else{const d=await json('https://api.weather.gov/alerts/active?area=WA');items=d.features.filter(f=>f.geometry).map(f=>{const c=L.geoJSON(f.geometry).getBounds().getCenter();return {lat:c.lat,lon:c.lng,title:f.properties.event,description:f.properties.headline,summary:f.properties.areaDesc,time:Date.parse(f.properties.sent),geometry:f.geometry}});l.unmapped=d.features.length-items.length;}l.items=items.filter(i=>Number.isFinite(i.lat)&&Number.isFinite(i.lon)&&(l.id!=='fire'||i.time>=Date.now()-3*3600000));l.fetched=Date.now();l.failed=false;l.status=`${l.items.length} ${l.id==='fire'?'in past 3h':'records'} · ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}${l.unmapped?` · ${l.unmapped} without geometry`:''}`;draw(l);}catch(e){l.failed=true;l.status=l.fetched?'Unavailable · last known data':'Feed unavailable · retrying';}renderControls();sync();}));const failures=layers.filter(l=>l.failed).length;$('refresh-status').textContent=failures?`${3-failures}/3 feeds connected · retry in 60s`:'3 feeds connected · refreshes every 60s';refreshing=false;$('refresh').disabled=false;if(selected)details(selected.l,selected.item);}
-// Socrata uses a timezone-less Seattle wall clock; derive the correct DST offset.
-function parseSeattleTime(s){if(!s)return null;const base=Date.parse(s+'Z');const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',timeZoneName:'shortOffset'}).formatToParts(new Date(base));const offset=+(parts.find(p=>p.type==='timeZoneName').value.match(/GMT([+-]\d+)/)?.[1]||0);return base-offset*3600000;}
-$('demo').onchange=sync;$('refresh').onclick=refresh;
-function preset(p){layers.forEach(l=>l.on=p==='all'||(p==='move'?['air','sea','transit'].includes(l.id):['weather','quake'].includes(l.id)));document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===p));renderControls();sync()}
-document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>preset(b.dataset.preset));$('reset').onclick=()=>{$('demo').checked=true;preset('all')};
-$('home').onclick=()=>{map.setView([47.61,-122.37],11);$('place').textContent='Seattle & Puget Sound'};
-$('mobile-layers').onclick=()=>$('sidebar').classList.toggle('open');map.on('click',()=>$('sidebar').classList.remove('open'));map.on('moveend',feed);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map).on('tileerror',()=>toast('Some basemap tiles are unavailable.'));
+let layers=[],catalog=[],selected=null,dark=false,toastTimer,loading=false;
+const groups=['Safety','Motion','Roads','Earth','Water','City'];
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',5000)}
+function ago(t){if(!t)return 'Time not supplied';const mins=Math.floor((Date.now()-t)/60000);return mins<0?'Future timestamp':mins<1?'Just now':mins<60?`${mins}m ago`:mins<1440?`${Math.floor(mins/60)}h ago`:`${Math.floor(mins/1440)}d ago`}
+function date(t){return t?new Date(t).toLocaleString(): 'Not supplied'}
+function staleItem(l,i){return Boolean(l.maxAge&&i.time&&Date.now()-i.time>l.maxAge*1000)}
+function mapped(l){return l.items.filter(i=>l.id!=='air'||!staleItem(l,i))}
+function status(l){if(l.loading&&!l.fetchedAt)return 'Connecting…';if(l.status==='unavailable')return 'Unavailable · retrying';if(l.status==='stale')return 'Feed unavailable · cached data';if(!l.fetchedAt)return 'Not loaded';if(l.id==='radar'&&l.raster)return `Radar frame · ${ago(Date.parse(l.raster.time))}`;return `${mapped(l).length} mapped · ${l.kind.toLowerCase()}${l.status==='partial'?' · partial':''}`}
+function controls(){
+  $('layers').innerHTML=groups.map(g=>`<div class="layer-group"><h3>${g}</h3>${layers.filter(l=>l.group===g).map(l=>`<div class="layer"><span class="layer-icon" style="--color:${l.color}">${l.icon}</span><div class="layer-info"><strong>${esc(l.name)}</strong><small id="status-${l.id}">${esc(status(l))}</small></div><label class="switch"><input type="checkbox" data-layer="${l.id}" aria-label="${esc(l.name)}" ${l.on?'checked':''}><span></span></label></div>`).join('')}</div>`).join('');
+  document.querySelectorAll('[data-layer]').forEach(e=>e.onchange=()=>{layers.find(l=>l.id===e.dataset.layer).on=e.checked;document.querySelectorAll('[data-preset]').forEach(b=>b.classList.remove('active'));sync()});
+}
+function details(l,i){
+  selected={layer:l.id,id:i.id};$('detail').hidden=false;
+  const stale=l.status==='stale'||staleItem(l,i);
+  $('detail').innerHTML=`<button class="close" aria-label="Close details">×</button><div class="detail-status">${stale?'STALE / LAST KNOWN · ':''}${esc(l.kind.toUpperCase())}</div><h3>${esc(i.title)}</h3><p>${esc(i.description)}</p><p><strong>Observation / report:</strong> ${esc(date(i.time))}<br><strong>Fetched:</strong> ${esc(date(l.fetchedAt))}</p>${i.image?`<a class="snapshot-link" href="${esc(i.image)}" target="_blank" rel="noopener">Open current camera snapshot ↗</a><p>Image capture time is not verified. Check the timestamp in the image.</p>`:''}<p>${esc(l.source)}<br>${esc(l.coverage)}<br>${i.lat.toFixed(4)}°, ${i.lon.toFixed(4)}°</p><p class="source-note">${esc(l.note||l.notes)}</p><a href="${esc(l.url)}" target="_blank" rel="noopener">Source documentation ↗</a>`;
+  $('detail').querySelector('.close').onclick=()=>{selected=null;$('detail').hidden=true};
+}
+function draw(l){
+  if(l.id==='radar'){
+    if(!l.on||!l.raster)return;
+    if(!l.wms){l.wms=L.tileLayer.wms(l.raster.url,{layers:l.raster.layer,format:'image/png',transparent:true,opacity:.55,time:l.raster.time,attribution:'Radar © NOAA / NWS'}).on('tileerror',()=>{l.status='partial';l.error='Some radar tiles failed. A blank tile is not proof of clear weather.';health();const el=$('status-radar');if(el)el.textContent='Radar imagery partially unavailable';});l.groupLayer.addLayer(l.wms)}
+    else if(l.wms.wmsParams.time!==l.raster.time)l.wms.setParams({time:l.raster.time});
+    return;
+  }
+  l.groupLayer.clearLayers();if(!l.on)return;
+  const buckets=new Map();
+  for(const i of mapped(l)){
+    const p=map.project([i.lat,i.lon],map.getZoom());
+    const key=map.getZoom()>=15?i.id:`${Math.floor(p.x/45)}:${Math.floor(p.y/45)}`;
+    if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);
+  }
+  for(const bucket of buckets.values()){
+    const i=bucket[0],isCluster=bucket.length>1;
+    const lat=isCluster?bucket.reduce((s,i)=>s+i.lat,0)/bucket.length:i.lat;
+    const lon=isCluster?bucket.reduce((s,i)=>s+i.lon,0)/bucket.length:i.lon;
+    const icon=L.divIcon({className:'signal',html:`<span class="marker ${isCluster?'cluster':''} ${l.status==='stale'||staleItem(l,i)?'stale':''}" style="--color:${l.color}">${isCluster?bucket.length:l.icon}</span>`,iconSize:[30,30],iconAnchor:[15,15]});
+    L.marker([lat,lon],{icon,title:isCluster?`${bucket.length} ${l.name} · zoom to expand`:i.title}).on('click',()=>{if(isCluster)map.fitBounds(bucket.map(i=>[i.lat,i.lon]),{padding:[60,60],maxZoom:16});else details(l,i)}).addTo(l.groupLayer);
+  }
+  for(const i of mapped(l).filter(i=>i.geometry))L.geoJSON(i.geometry,{style:{color:l.color,weight:1.5,fillOpacity:.10}}).on('click',()=>details(l,i)).addTo(l.groupLayer);
+}
+function inView(i){if(map.getBounds().contains([i.lat,i.lon]))return true;if(i.geometry){try{const b=L.geoJSON(i.geometry).getBounds();return b.isValid()&&map.getBounds().intersects(b)}catch{return false}}return false}
+function feed(){
+  const items=layers.filter(l=>l.on).flatMap(l=>mapped(l).filter(inView).map(i=>({l,i}))).sort((a,b)=>(b.i.time||0)-(a.i.time||0));
+  $('signal-count').textContent=items.length.toLocaleString();$('visible-count').textContent=`${items.length.toLocaleString()} signals in view`;$('layer-count').textContent=layers.filter(l=>l.on).length;
+  $('feed').innerHTML=items.length?items.slice(0,25).map(({l,i},n)=>`<button class="feed-item" data-index="${n}"><span class="layer-icon" style="--color:${l.color}">${l.icon}</span><span><strong>${esc(i.title)}</strong><small>${esc(i.summary||l.name)}</small><span class="badge">${l.status==='stale'||staleItem(l,i)?'STALE · ':''}${esc(l.kind)} · ${esc(ago(i.time))}</span></span></button>`).join(''):'<p class="empty">No mapped records in this view. Enable a layer or zoom out. A blank map does not establish that no activity exists.</p>';
+  document.querySelectorAll('[data-index]').forEach(b=>b.onclick=()=>{const {l,i}=items[+b.dataset.index];map.panTo([i.lat,i.lon]);details(l,i)});
+}
+function sync(){for(const l of layers){if(l.on){l.groupLayer.addTo(map);draw(l)}else map.removeLayer(l.groupLayer)}if(selected&&!layers.find(l=>l.id===selected.layer)?.on){selected=null;$('detail').hidden=true}feed()}
+function health(){
+  const connected=layers.filter(l=>['ok','partial'].includes(l.status)).length;
+  const issues=layers.filter(l=>['unavailable','stale','partial'].includes(l.status)).length;
+  $('refresh-status').textContent=`${connected}/${layers.length} sources responding${issues?` · ${issues} need attention`:''} · source-specific refresh`;
+  $('catalog-summary').textContent=`${layers.length} integrated sources · ${catalog.length-layers.length} additional sources cataloged`;
+}
+async function load(l){
+  l.loading=true;
+  try{
+    const r=await fetch(`/api/${l.id}`,{signal:AbortSignal.timeout(70000)});
+    if(!r.ok)throw Error('Backend unavailable');const d=await r.json();if(!Array.isArray(d.items))throw Error('Invalid response');
+    Object.assign(l,d);l.next=Date.now()+(['ok','partial'].includes(l.status)?l.refresh:60)*1000;
+  }catch{
+    l.status=l.fetchedAt?'stale':'unavailable';l.error='Cannot reach the Scout data server. Start python scout/server.py and retry.';l.next=Date.now()+60000;
+  }finally{
+    l.loading=false;const el=$(`status-${l.id}`);if(el)el.textContent=status(l);if(l.on)draw(l);feed();health();
+    if(selected?.layer===l.id){const item=l.items.find(i=>i.id===selected.id);if(item)details(l,item);else{selected=null;$('detail').hidden=true;toast('That record is no longer in the latest source response.')}}
+  }
+}
+async function refresh(force=false){
+  if(loading)return;loading=true;$('refresh').disabled=true;
+  const queue=layers.filter(l=>!l.loading&&(force||Date.now()>=l.next));
+  async function worker(){while(queue.length)await load(queue.shift())}
+  try{await Promise.all(Array.from({length:Math.min(4,queue.length)},worker))}finally{loading=false;$('refresh').disabled=false;health()}
+}
+function preset(p){layers.forEach(l=>l.on=p==='all'?true:p==='default'?l.defaultOn:p==='move'?['Motion','Roads'].includes(l.group):['Earth','Water'].includes(l.group));document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===p));controls();sync()}
+document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>preset(b.dataset.preset));$('reset').onclick=()=>preset('default');$('refresh').onclick=()=>refresh(true);
+function goHome(){map.setView(home.center,home.zoom);$('place').textContent=home.name;$('region').value='bay'}$('home').onclick=goHome;
+$('region').onchange=()=>{const v={bay:home,sf:{center:[37.77,-122.43],zoom:12,name:'San Francisco'},east:{center:[37.84,-122.22],zoom:11,name:'East Bay'},south:{center:[37.37,-121.97],zoom:11,name:'South Bay'},north:{center:[38.2,-122.55],zoom:10,name:'North Bay'}}[$('region').value];map.setView(v.center,v.zoom);$('place').textContent=v.name};
+$('mobile-layers').onclick=()=>$('sidebar').classList.toggle('open');map.on('click',()=>$('sidebar').classList.remove('open'));map.on('moveend',feed);map.on('zoomend',()=>{layers.filter(l=>l.on).forEach(draw);feed()});
 $('theme').onclick=()=>{dark=!dark;$('map').classList.toggle('dark-map',dark)};
-$('locate').onclick=()=>{if(!navigator.geolocation)return toast('Location is not supported in this browser.');navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],12);$('place').textContent='Around you';toast('Local feeds cover Seattle and Washington; earthquakes are global.')},()=>toast('Location unavailable. Search for a city instead.'),{timeout:10000})};
-$('save').onclick=()=>{try{localStorage.setItem('scout-view',JSON.stringify({center:map.getCenter(),zoom:map.getZoom(),place:$('place').textContent,layers:layers.filter(l=>l.on).map(l=>l.id),demo:$('demo').checked}));toast('View saved on this device.')}catch{toast('Your browser could not save this view.')}};
-$('restore').onclick=()=>{try{const v=JSON.parse(localStorage.getItem('scout-view'));if(!v)return toast('Save a view first using ☆ Save view.');map.setView(v.center,v.zoom);$('place').textContent=v.place;layers.forEach(l=>l.on=v.layers.includes(l.id));$('demo').checked=v.demo;renderControls();sync();toast('Saved view restored.')}catch{toast('Saved view unavailable.')}};
-let searching=false;$('search').onsubmit=async e=>{e.preventDefault();const q=$('query').value.trim();if(!q||searching)return;const coord=q.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);if(coord){const lat=+coord[1],lon=+coord[2];if(Math.abs(lat)>90||Math.abs(lon)>180){$('search-result').textContent='Use latitude −90…90, longitude −180…180.';return}map.setView([lat,lon],11);$('place').textContent=q;$('search-result').textContent='';return}searching=true;$('search-result').textContent='Finding your place…';try{const d=await json('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name='+encodeURIComponent(q));if(!d.results?.length)throw Error('No match');const r=d.results[0];map.setView([r.latitude,r.longitude],11);$('place').textContent=`${r.name}, ${r.admin1||r.country}`;$('search-result').textContent='Local feeds: Seattle / WA. Earthquakes: worldwide.';$('sidebar').classList.remove('open')}catch{$('search-result').textContent='Place not found or search unavailable. Try coordinates.'}finally{searching=false}};
-$('sources').onclick=()=>{$('source-list').innerHTML=layers.map(l=>`<div class="source-row"><div><strong>${l.name}</strong><small>${esc(l.demo?'Fictional Seattle examples':l.source)}</small><small>${esc(l.status)}</small></div>${l.demo?'<span>DEMO</span>':`<a href="${l.url}" target="_blank" rel="noopener">Source ↗</a>`}</div>`).join('');$('source-dialog').showModal()};$('source-dialog').querySelector('.close').onclick=()=>$('source-dialog').close();
-function clock(){$('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',timeZoneName:'short'})}clock();setInterval(clock,1000);demo();renderControls();sync();refresh();setInterval(refresh,60000);
+$('locate').onclick=()=>{if(!navigator.geolocation)return toast('Location is not supported.');navigator.geolocation.getCurrentPosition(p=>{map.setView([p.coords.latitude,p.coords.longitude],12);$('place').textContent='Around you';toast('Feeds cover the Bay Area envelope; SF dispatch and 311 cover SF only.')},()=>toast('Location unavailable. Search for a city instead.'),{timeout:10000})};
+$('save').onclick=()=>{try{localStorage.setItem('scout-bay-view',JSON.stringify({center:map.getCenter(),zoom:map.getZoom(),place:$('place').textContent,layers:layers.filter(l=>l.on).map(l=>l.id)}));toast('View saved on this device.')}catch{toast('Your browser could not save this view.')}};
+$('restore').onclick=()=>{try{const v=JSON.parse(localStorage.getItem('scout-bay-view'));if(!v)return toast('Save a view first using ☆ Save view.');map.setView(v.center,v.zoom);$('place').textContent=v.place;layers.forEach(l=>l.on=v.layers.includes(l.id));controls();sync();toast('Saved view restored.')}catch{toast('Saved view unavailable.')}};
+let searching=false;
+$('search').onsubmit=async e=>{
+ e.preventDefault();const q=$('query').value.trim();if(!q||searching)return;
+ const c=q.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+ if(c){if(Math.abs(+c[1])>90||Math.abs(+c[2])>180){$('search-result').textContent='Coordinates are out of range.';return}map.setView([+c[1],+c[2]],12);$('place').textContent=q;$('search-result').textContent='';return}
+ searching=true;$('search-result').textContent='Finding your place…';
+ try{const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name='+encodeURIComponent(q),{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();const d=await r.json();if(!d.results?.length)throw Error();const p=d.results[0];map.setView([p.latitude,p.longitude],12);$('place').textContent=`${p.name}, ${p.admin1||p.country}`;$('search-result').textContent='Data coverage remains the SF Bay Area.';$('sidebar').classList.remove('open')}catch{$('search-result').textContent='Search unavailable or no match. Try coordinates.'}finally{searching=false}
+};
+function showSources(){
+ const q=$('source-query').value.toLowerCase();
+ $('source-list').innerHTML=catalog.filter(s=>`${s.name} ${s.source} ${s.group} ${s.notes}`.toLowerCase().includes(q)).map(s=>{const l=layers.find(l=>l.id===s.id);return `<div class="source-row"><div><strong>${esc(s.name)}</strong><span class="source-chip">${esc(s.access==='integrated'?`${s.kind} · ${status(l)}`:s.access)}</span><small>${esc(s.source)}${s.coverage?' · '+esc(s.coverage):''}</small><p>${esc(s.notes)}</p>${l?`<small>Fetch interval: ${s.refresh}s · fetched ${esc(date(l.fetchedAt))}</small><p>${esc(l.error||l.note||'Waiting for first response.')}</p>`:''}</div><a href="${esc(s.url)}" target="_blank" rel="noopener">Source ↗</a></div>`}).join('');
+}
+$('sources').onclick=()=>{showSources();$('source-dialog').showModal()};$('source-query').oninput=showSources;$('source-dialog').querySelector('.close').onclick=()=>$('source-dialog').close();$('open-catalog').onclick=$('sources').onclick;
+function clock(){$('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',timeZoneName:'short'})}clock();setInterval(clock,1000);
+async function boot(){try{const r=await fetch('sources.json');if(!r.ok)throw Error();catalog=await r.json();layers=catalog.filter(s=>s.access==='integrated').map(s=>({...s,on:s.defaultOn,items:[],status:'loading',next:0,groupLayer:L.layerGroup()}));controls();sync();health();await refresh();setInterval(()=>{refresh();layers.filter(l=>l.on&&l.id==='air').forEach(draw);feed()},15000)}catch{toast('Source catalog failed to load. Start the Scout server and refresh.')}}boot();

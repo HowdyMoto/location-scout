@@ -6,3 +6,8 @@ scout/preview.png
 .env.*
 !.env.example
 node_modules/
+
+.venv/
+__pycache__/
+*.pyc
+scout/qa/
