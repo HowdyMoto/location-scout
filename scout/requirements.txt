@@ -1,1 +1,2 @@
 tzdata>=2025.2
+gtfs-realtime-bindings>=3.0,<4

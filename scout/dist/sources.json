@@ -13,7 +13,8 @@
     "coverage": "San Francisco; rolling 48h",
     "notes": "10-minute refresh plus 10-minute delay. Some locations are redacted.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "fire",
@@ -29,7 +30,8 @@
     "coverage": "San Francisco; last 72h",
     "notes": "Daily publication. Responding units combined into incidents.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "civic",
@@ -45,7 +47,8 @@
     "coverage": "San Francisco; last 72h",
     "notes": "Public service requests, not confirmed findings.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "air",
@@ -61,7 +64,8 @@
     "coverage": "65 nautical miles around 37.8, -122.3",
     "notes": "ADS-B/MLAT reception is incomplete. ODbL attribution applies.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "bikes",
@@ -77,7 +81,8 @@
     "coverage": "Participating Bay Area stations",
     "notes": "Live GBFS station reports; includes rental/return status.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "bart",
@@ -93,7 +98,8 @@
     "coverage": "BART stations",
     "notes": "Predicted departures at stations, not train GPS. Uses BART’s published public key.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "cameras",
@@ -109,7 +115,8 @@
     "coverage": "Caltrans District 4",
     "notes": "Camera locations and on-demand snapshots. Capture time is not supplied in metadata.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "signs",
@@ -125,7 +132,8 @@
     "coverage": "Caltrans District 4",
     "notes": "Only signs with a nonblank message are shown.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "closures",
@@ -141,7 +149,8 @@
     "coverage": "Caltrans District 4",
     "notes": "Active schedule windows and planned closures; not a congestion measurement.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "quake",
@@ -157,7 +166,8 @@
     "coverage": "Regional envelope; last 7 days",
     "notes": "Recent seismic events, not earthquake prediction.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "alerts",
@@ -173,7 +183,8 @@
     "coverage": "Bay Area intersecting polygons / forecast zones",
     "notes": "Active warnings and advisories. Zone geometry may be broader than the event.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "weather",
@@ -189,7 +200,8 @@
     "coverage": "10 Bay Area airport stations",
     "notes": "Measured station conditions; observation age shown.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "tides",
@@ -205,7 +217,8 @@
     "coverage": "Seven Bay / nearby coastal gauges",
     "notes": "Preliminary water levels relative to MLLW; not water depth.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "rivers",
@@ -221,7 +234,8 @@
     "coverage": "Regional envelope; observations within 24h",
     "notes": "Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "airquality",
@@ -237,7 +251,8 @@
     "coverage": "10 city samples across nine counties",
     "notes": "Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial.",
     "defaultOn": false,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "wildfire",
@@ -253,7 +268,8 @@
     "coverage": "Regional envelope",
     "notes": "Agency incident reports, not evacuation boundaries or guaranteed current perimeters.",
     "defaultOn": true,
-    "access": "integrated"
+    "access": "integrated",
+    "region": "bay"
   },
   {
     "id": "511-transit",
@@ -262,7 +278,8 @@
     "access": "API key required",
     "source": "MTC 511",
     "url": "https://511.org/open-data/transit",
-    "notes": "Muni, AC Transit, VTA, SamTrans, Caltrain, ferries and other participating agencies. GTFS-RT/SIRI; availability varies by operator. Default token budget 60 calls/hour."
+    "notes": "Muni, AC Transit, VTA, SamTrans, Caltrain, ferries and other participating agencies. GTFS-RT/SIRI; availability varies by operator. Default token budget 60 calls/hour.",
+    "region": "bay"
   },
   {
     "id": "511-traffic",
@@ -271,7 +288,8 @@
     "access": "API key required",
     "source": "MTC 511",
     "url": "https://511.org/open-data/traffic",
-    "notes": "Regional traffic events, WZDx closures and bridge/express-lane tolls. Distinct from Caltrans lane schedules."
+    "notes": "Regional traffic events, WZDx closures and bridge/express-lane tolls. Distinct from Caltrans lane schedules.",
+    "region": "bay"
   },
   {
     "id": "ais",
@@ -280,7 +298,8 @@
     "access": "API key required",
     "source": "AISStream",
     "url": "https://aisstream.io/",
-    "notes": "WebSocket AIS observations; requires an account/key and persistent stream adapter. Coverage is receiver-dependent."
+    "notes": "WebSocket AIS observations; requires an account/key and persistent stream adapter. Coverage is receiver-dependent.",
+    "region": "bay"
   },
   {
     "id": "airnow",
@@ -289,7 +308,8 @@
     "access": "API key required",
     "source": "AirNow",
     "url": "https://docs.airnowapi.org/",
-    "notes": "Regulatory monitor / reporting-area AQI. Separate from the integrated CAMS model."
+    "notes": "Regulatory monitor / reporting-area AQI. Separate from the integrated CAMS model.",
+    "region": "bay"
   },
   {
     "id": "purpleair",
@@ -298,7 +318,8 @@
     "access": "API key / credits required",
     "source": "PurpleAir",
     "url": "https://api.purpleair.com/",
-    "notes": "Community sensors; corrections, placement and usage charges matter."
+    "notes": "Community sensors; corrections, placement and usage charges matter.",
+    "region": "bay"
   },
   {
     "id": "firms",
@@ -307,7 +328,8 @@
     "access": "API key required",
     "source": "NASA FIRMS",
     "url": "https://firms.modaps.eosdis.nasa.gov/api/area/",
-    "notes": "Satellite-overpass detections; free MAP_KEY. Heat is not necessarily a wildfire."
+    "notes": "Satellite-overpass detections; free MAP_KEY. Heat is not necessarily a wildfire.",
+    "region": "bay"
   },
   {
     "id": "power",
@@ -316,7 +338,8 @@
     "access": "Provider access needed",
     "source": "PG&E / local utilities",
     "url": "https://pgealerts.alerts.pge.com/outage-tools/outage-map/",
-    "notes": "Public outage viewer. No supported reusable public API verified. Also investigate Silicon Valley Power and Palo Alto Utilities; PG&E does not cover every customer."
+    "notes": "Public outage viewer. No supported reusable public API verified. Also investigate Silicon Valley Power and Palo Alto Utilities; PG&E does not cover every customer.",
+    "region": "bay"
   },
   {
     "id": "outage-api",
@@ -325,7 +348,8 @@
     "access": "Commercial access",
     "source": "PowerOutage.us",
     "url": "https://poweroutage.us/use-our-data",
-    "notes": "Licensed API; provider geography/granularity varies."
+    "notes": "Licensed API; provider geography/granularity varies.",
+    "region": "bay"
   },
   {
     "id": "ev",
@@ -334,7 +358,8 @@
     "access": "Partner access needed",
     "source": "OCPI / charging operators",
     "url": "https://evroaming.org/ocpi/",
-    "notes": "Live stall status generally requires operator/roaming access. Charger-location catalogs alone are not live availability."
+    "notes": "Live stall status generally requires operator/roaming access. Charger-location catalogs alone are not live availability.",
+    "region": "bay"
   },
   {
     "id": "ev-locations",
@@ -343,7 +368,8 @@
     "access": "API key required",
     "source": "NREL Alternative Fuels Data Center",
     "url": "https://developer.nrel.gov/docs/transportation/alt-fuel-stations-v1/",
-    "notes": "Station directory; not a promise of live stall occupancy."
+    "notes": "Station directory; not a promise of live stall occupancy.",
+    "region": "bay"
   },
   {
     "id": "parking",
@@ -352,7 +378,8 @@
     "access": "Feed not verified",
     "source": "SFMTA / SFPark",
     "url": "https://www.sfmta.com/garages-lots",
-    "notes": "Historical/open parking datasets are not proof of a working live occupancy feed."
+    "notes": "Historical/open parking datasets are not proof of a working live occupancy feed.",
+    "region": "bay"
   },
   {
     "id": "evacuation",
@@ -361,7 +388,8 @@
     "access": "Provider access needed",
     "source": "County emergency agencies / Genasys Protect",
     "url": "https://protect.genasys.com/",
-    "notes": "Use official county alerts. A stable, licensed regional ingestion API has not been verified."
+    "notes": "Use official county alerts. A stable, licensed regional ingestion API has not been verified.",
+    "region": "bay"
   },
   {
     "id": "calfire",
@@ -370,7 +398,8 @@
     "access": "Public viewer",
     "source": "CAL FIRE",
     "url": "https://www.fire.ca.gov/incidents",
-    "notes": "Official incident reports; not updated on a guaranteed schedule. NIFC incident feed is integrated separately."
+    "notes": "Official incident reports; not updated on a guaranteed schedule. NIFC incident feed is integrated separately.",
+    "region": "bay"
   },
   {
     "id": "radar",
@@ -386,7 +415,8 @@
     "refresh": 300,
     "maxAge": 900,
     "coverage": "NOAA CONUS mosaic viewed over the Bay Area",
-    "defaultOn": false
+    "defaultOn": false,
+    "region": "bay"
   },
   {
     "id": "buoys",
@@ -402,7 +432,8 @@
     "refresh": 600,
     "maxAge": 7200,
     "coverage": "Regional envelope: offshore and coastal stations",
-    "defaultOn": false
+    "defaultOn": false,
+    "region": "bay"
   },
   {
     "id": "oakland",
@@ -411,7 +442,8 @@
     "access": "Dataset audit needed",
     "source": "City of Oakland",
     "url": "https://data.oaklandca.gov/",
-    "notes": "Local 311 and civic data. Not yet verified as a near-live dispatch source."
+    "notes": "Local 311 and civic data. Not yet verified as a near-live dispatch source.",
+    "region": "bay"
   },
   {
     "id": "sanjose",
@@ -420,7 +452,8 @@
     "access": "Dataset audit needed",
     "source": "City of San Jose",
     "url": "https://data.sanjoseca.gov/",
-    "notes": "Municipal open data; cadence and public API availability must be verified dataset by dataset."
+    "notes": "Municipal open data; cadence and public API availability must be verified dataset by dataset.",
+    "region": "bay"
   },
   {
     "id": "county",
@@ -429,6 +462,483 @@
     "access": "Coverage varies",
     "source": "Bay Area county agencies",
     "url": "https://www.bayareametro.gov/about-bay-area",
-    "notes": "Alameda, Contra Costa, Marin, Napa, San Mateo, Santa Clara, Solano and Sonoma require separate feed agreements/audits. SF dispatch is not regional dispatch coverage."
+    "notes": "Alameda, Contra Costa, Marin, Napa, San Mateo, Santa Clara, Solano and Sonoma require separate feed agreements/audits. SF dispatch is not regional dispatch coverage.",
+    "region": "bay"
+  },
+  {
+    "id": "sea-air",
+    "name": "Aircraft",
+    "icon": "✈",
+    "color": "#9c78cd",
+    "group": "Motion",
+    "kind": "Live",
+    "source": "adsb.lol contributors",
+    "url": "https://api.adsb.lol/docs",
+    "refresh": 30,
+    "maxAge": 120,
+    "coverage": "85 nautical miles around 47.6, -122.3; clipped to the Puget Sound envelope",
+    "notes": "ADS-B/MLAT reception is incomplete. ODbL attribution applies.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-quake",
+    "name": "Earthquakes",
+    "icon": "◎",
+    "color": "#ae9670",
+    "group": "Earth",
+    "kind": "Observed",
+    "source": "USGS Earthquake Hazards",
+    "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php",
+    "refresh": 300,
+    "maxAge": 0,
+    "coverage": "Seattle / Puget Sound regional envelope",
+    "notes": "Recent seismic events, not earthquake prediction.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-weather",
+    "name": "Weather stations",
+    "icon": "☁",
+    "color": "#7392ac",
+    "group": "Earth",
+    "kind": "Observed",
+    "source": "National Weather Service",
+    "url": "https://www.weather.gov/documentation/services-web-api",
+    "refresh": 600,
+    "maxAge": 7200,
+    "coverage": "Nine Puget Sound / nearby airport stations",
+    "notes": "Measured station conditions; observation age shown.",
+    "defaultOn": false,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-tides",
+    "name": "Tide gauges",
+    "icon": "≈",
+    "color": "#409ab4",
+    "group": "Water",
+    "kind": "Observed",
+    "source": "NOAA CO-OPS",
+    "url": "https://api.tidesandcurrents.noaa.gov/api/prod/",
+    "refresh": 360,
+    "maxAge": 1800,
+    "coverage": "Seattle, Tacoma, Port Townsend, Friday Harbor and Port Angeles",
+    "notes": "Preliminary water levels relative to MLLW; not water depth.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-rivers",
+    "name": "River & water gauges",
+    "icon": "≋",
+    "color": "#5a9f93",
+    "group": "Water",
+    "kind": "Observed",
+    "source": "USGS Water Data",
+    "url": "https://api.waterdata.usgs.gov/docs/ogcapi/",
+    "refresh": 900,
+    "maxAge": 7200,
+    "coverage": "Seattle / Puget Sound regional envelope",
+    "notes": "Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply.",
+    "defaultOn": false,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-wildfire",
+    "name": "Wildfire incidents",
+    "icon": "♨",
+    "color": "#c47751",
+    "group": "Safety",
+    "kind": "Reports",
+    "source": "NIFC / WFIGS",
+    "url": "https://data-nifc.opendata.arcgis.com/",
+    "refresh": 900,
+    "maxAge": 86400,
+    "coverage": "Seattle / Puget Sound regional envelope",
+    "notes": "Agency incident reports, not evacuation boundaries or guaranteed current perimeters.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-buoys",
+    "name": "Buoys & coastal conditions",
+    "group": "Water",
+    "access": "integrated",
+    "source": "NOAA NDBC",
+    "url": "https://www.ndbc.noaa.gov/",
+    "notes": "Latest NDBC wind, wave and water-temperature reports. Missing observations remain missing.",
+    "icon": "≈",
+    "color": "#4d9aa1",
+    "kind": "Observed",
+    "refresh": 600,
+    "maxAge": 7200,
+    "coverage": "Seattle / Puget Sound regional envelope",
+    "defaultOn": false,
+    "region": "seattle"
+  },
+  {
+    "id": "sea-radar",
+    "name": "Weather radar",
+    "group": "Earth",
+    "access": "integrated",
+    "source": "NOAA NEXRAD",
+    "url": "https://www.weather.gov/gis/cloudgiswebservices",
+    "notes": "Timestamped base reflectivity raster overlay. Echoes are not a forecast; blank tiles do not establish good weather.",
+    "icon": "◴",
+    "color": "#6e9d70",
+    "kind": "Radar",
+    "refresh": 300,
+    "maxAge": 900,
+    "coverage": "Seattle / Puget Sound regional envelope",
+    "defaultOn": false,
+    "region": "seattle"
+  },
+  {
+    "id": "sea-airquality",
+    "name": "Air quality model",
+    "icon": "◌",
+    "color": "#9b9b66",
+    "group": "Earth",
+    "kind": "Modeled",
+    "source": "CAMS / Open-Meteo",
+    "url": "https://open-meteo.com/en/docs/air-quality-api",
+    "refresh": 3600,
+    "maxAge": 10800,
+    "coverage": "Eight Puget Sound / nearby city model samples",
+    "notes": "Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial.",
+    "defaultOn": false,
+    "access": "integrated",
+    "region": "seattle"
+  },
+  {
+    "id": "sea-fire",
+    "name": "Seattle fire & EMS calls",
+    "region": "seattle",
+    "group": "Safety",
+    "kind": "Live",
+    "url": "https://data.seattle.gov/d/kzjm-xkqj",
+    "notes": "Past six hours of dispatches, not active-incident confirmation.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": true,
+    "source": "City of Seattle",
+    "access": "integrated",
+    "icon": "♨",
+    "color": "#cd7374",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-police",
+    "name": "Seattle police call history",
+    "region": "seattle",
+    "group": "Safety",
+    "kind": "Delayed",
+    "url": "https://data.seattle.gov/d/33kz-ixgy",
+    "notes": "Published call history can lag days. Last seven days, no officer tracking.",
+    "refresh": 3600,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "integrated",
+    "icon": "◇",
+    "color": "#647ca6",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-parking",
+    "name": "Paid parking snapshots",
+    "region": "seattle",
+    "group": "City",
+    "kind": "Delayed",
+    "url": "https://data.seattle.gov/d/hiyf-7edq",
+    "notes": "Latest published payment-derived estimate. Not live space availability; publication may lag a day.",
+    "refresh": 3600,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "integrated",
+    "icon": "P",
+    "color": "#cc9257",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-cameras",
+    "name": "SDOT traffic cameras",
+    "region": "seattle",
+    "group": "Roads",
+    "kind": "Directory",
+    "url": "https://www.arcgis.com/home/item.html?id=45a7e9f4d9584dbd9fdce1b951a7c4f6",
+    "notes": "Active camera locations; imagery opens on the official SDOT traveler map. Registry is not live imagery.",
+    "refresh": 86400,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "integrated",
+    "icon": "◉",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-alerts",
+    "name": "Weather warnings",
+    "region": "seattle",
+    "group": "Safety",
+    "kind": "Live",
+    "url": "https://www.weather.gov/documentation/services-web-api",
+    "notes": "Active NWS warnings and zone polygons intersecting Puget Sound.",
+    "refresh": 300,
+    "maxAge": 0,
+    "defaultOn": true,
+    "source": "NOAA / NWS",
+    "access": "integrated",
+    "icon": "!",
+    "color": "#cc9257",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-metro",
+    "name": "King County Metro vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "King County Metro",
+    "access": "integrated",
+    "icon": "▣",
+    "color": "#439879",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-sound",
+    "name": "Sound Transit vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "Sound Transit",
+    "access": "integrated",
+    "icon": "▣",
+    "color": "#578bc0",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-community",
+    "name": "Community Transit vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "Community Transit",
+    "access": "integrated",
+    "icon": "▣",
+    "color": "#9775be",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-everett",
+    "name": "Everett Transit vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "Everett Transit",
+    "access": "integrated",
+    "icon": "▣",
+    "color": "#c08b43",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-kitsap",
+    "name": "Kitsap Transit vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "Kitsap Transit",
+    "access": "integrated",
+    "icon": "▣",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-ferries",
+    "name": "Washington State Ferries",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Live",
+    "url": "https://www.wsdot.wa.gov/ferries/api/vessels/documentation/",
+    "notes": "Adapter ready. Set WSDOT_API_KEY on the server; registration required. No simulated vessels.",
+    "refresh": 30,
+    "maxAge": 300,
+    "defaultOn": false,
+    "source": "WSDOT",
+    "access": "integrated",
+    "icon": "⛴",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-pierce",
+    "name": "Pierce Transit vehicles",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Candidate",
+    "url": "https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads",
+    "notes": "Official linked Swiftly endpoint returned HTTP 401; provider authorization needed.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-traffic",
+    "name": "WSDOT incidents, speeds & highway cameras",
+    "region": "seattle",
+    "group": "Roads",
+    "kind": "Candidate",
+    "url": "https://wsdot.wa.gov/traffic/api/",
+    "notes": "WSDOT Traveler API registration/access code needed. Separate feeds for incidents, cameras, mountain passes and travel times.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-power",
+    "name": "Seattle City Light outages",
+    "region": "seattle",
+    "group": "City",
+    "kind": "Candidate",
+    "url": "https://www.seattle.gov/city-light/outages",
+    "notes": "Official outage viewer available; no supported anonymous API verified. PSE, Tacoma Power and Snohomish PUD require separate integrations.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-ships",
+    "name": "Commercial vessels & AIS",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Candidate",
+    "url": "https://aisstream.io/",
+    "notes": "AISStream key and server-side WebSocket ingestion required; AIS coverage is incomplete.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-scooters",
+    "name": "Shared bikes & scooters",
+    "region": "seattle",
+    "group": "Motion",
+    "kind": "Candidate",
+    "url": "https://www.seattle.gov/transportation/projects-and-programs/programs/bike-program/bike-share",
+    "notes": "Operator GBFS endpoints and access terms need verification; private rider trips are not mapped.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-airnow",
+    "name": "Measured air quality & smoke",
+    "region": "seattle",
+    "group": "Earth",
+    "kind": "Candidate",
+    "url": "https://docs.airnowapi.org/",
+    "notes": "AirNow API key required. The connected CAMS layer is modeled air quality, not measured sensors.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-snow",
+    "name": "Mountain snow & avalanche conditions",
+    "region": "seattle",
+    "group": "Earth",
+    "kind": "Candidate",
+    "url": "https://nwac.us/",
+    "notes": "NWAC observations and forecasts are promising; stable API and reuse terms still need verification.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "sea-orcas",
+    "name": "Whale sightings",
+    "region": "seattle",
+    "group": "Water",
+    "kind": "Candidate",
+    "url": "https://www.orcanetwork.org/",
+    "notes": "Sightings are delayed community reports, not real-time animal tracking. No supported open API verified.",
+    "refresh": 60,
+    "maxAge": 0,
+    "defaultOn": false,
+    "source": "City of Seattle",
+    "access": "access / research needed",
+    "icon": "◎",
+    "color": "#399ebc",
+    "coverage": "Seattle / Puget Sound; provider coverage varies"
   }
 ]

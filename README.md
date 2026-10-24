@@ -1,8 +1,8 @@
-# Location Scout — SF Bay Area
+# Location Scout — Seattle + SF Bay Area
 
-Explore public Bay Area data on one map. **18 integrated source adapters**, plus a searchable catalog of **16 additional providers / source families** that need credentials, agreements, or further verification. No simulated events.
+Explore public geographic data on one map, defaulting to **Seattle / Puget Sound**, with a region selector for the **SF Bay Area**. Seattle has **19 public adapters plus a configurable WSDOT ferry adapter**; the Bay Area retains its **18 adapters**. No simulated events.
 
-This is a researched starting inventory, not an exhaustive list of every API in the region. San Francisco dispatch and 311 feeds cover SF only. Regional feeds use the envelope longitude −123.6…−121.2, latitude 36.8…38.9, which includes adjacent areas and is not an exact nine-county boundary.
+This is a researched starting inventory, not every regional API. Seattle's envelope is longitude −123.6…−121.2, latitude 46.8…48.8; the Bay Area envelope is −123.6…−121.2, 36.8…38.9. These include adjacent areas, not exact municipal boundaries. City dispatch feeds cover only their city.
 
 ## Run
 
@@ -28,7 +28,19 @@ macOS / Linux:
 
 Open **http://127.0.0.1:5281**. Choose another port with `--port 5282`. On Windows, `scout/start.cmd` launches the project virtual environment after installation.
 
-## Integrated data
+## Seattle / Puget Sound
+
+- **Moving vehicles:** King County Metro, Sound Transit, Community Transit, Everett Transit and Kitsap Transit GPS feeds, plus aircraft. Refresh every 30 seconds; transit reports expire after five minutes, aircraft after two. At zoom level 12+, short trails connect up to six observations from the past three minutes. Lines do not represent roads or predicted travel.
+- **Safety:** Seattle fire / EMS calls from the last six hours; active NWS weather warnings; NIFC wildfire reports; seven days of earthquakes.
+- **Water and weather:** nine weather stations, five tide gauges, USGS river gauges, NDBC buoy/coastal conditions, NOAA radar and eight modeled air-quality samples.
+- **City context:** 393 active SDOT camera locations during verification, linking to the official camera viewer; delayed police call history and paid-parking snapshots, off by default. Parking is derived from payments, not live available-space sensors.
+- **Ferries:** parser implemented, awaiting a WSDOT access code. Register through [WSDOT](https://www.wsdot.wa.gov/ferries/api/vessels/documentation/), set `$env:WSDOT_API_KEY='your-code'` in the server shell and restart. The code stays on the server; do not commit it. Real provider responses have not been tested without credentials.
+
+During the October 24, 2026 live smoke test, all 19 public Seattle adapters responded, including about 615 transit vehicles, 121 aircraft, 76 fire calls, 146 river gauges and 13 coastal observations. Counts change. Police's newest published call was October 20; parking's newest snapshot was October 23. These are labeled delayed history.
+
+Transit scheduling, geographic, and real-time data provided by permission of King County.
+
+## Bay Area integrated data
 
 | Layer | Coverage / meaning | Fetch interval |
 | --- | --- | --- |
@@ -59,11 +71,12 @@ See [the source audit](docs/SOURCES.md) for provider links, access requirements 
 
 - `scout/server.py`: loopback-only Python HTTP server, fixed adapter routes, per-source cache and locks; no generic proxy.
 - `scout/feeds.py`: provider adapters and normalized records. Coordinates are validated and bounded; redacted locations are not reconstructed.
+- `scout/seattle.py`: Seattle-specific feeds and explicit regional configuration for shared adapters.
 - `scout/dist/sources.json`: source registry and access inventory, shared by backend and UI.
 - `scout/dist/`: buildless Leaflet UI, zoom-dependent clusters, presets, regional shortcuts, source details, saved views and city/coordinate search.
 - `scout/tests/test_feeds.py`: deterministic adapter/cache tests; no network needed.
 
-The only Python dependency is `tzdata` for reliable Pacific timestamps on Windows. Backend fetches avoid browser CORS restrictions. No personal API keys are required for the integrated layers: BART explicitly publishes the shared legacy API key used here. No credentials are stored in source. Saved map views use browser localStorage.
+Python dependencies are `tzdata` for Pacific timestamps and `gtfs-realtime-bindings` / protobuf for transit feeds. Backend fetches avoid browser CORS restrictions. The public layers need no personal API keys; the optional ferry adapter requires WSDOT_API_KEY. BART explicitly publishes the shared legacy API key used here. No credentials are stored in source. Saved map views use browser localStorage.
 
 ## Verification
 
@@ -72,7 +85,7 @@ The only Python dependency is `tzdata` for reliable Pacific timestamps on Window
 node --check scout/dist/app.js
 ```
 
-All 18 integrated sources returned successful responses in the browser on 2026-10-24. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
+All 18 Bay Area sources and 19 public Seattle sources returned successful responses on 2026-10-24. All 15 regression tests passed; browser checks covered region switching, source filtering and saved-view restoration. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
 
 ## Data terms and limits
 

@@ -7,6 +7,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 from feeds import ADAPTERS
+from seattle import ADAPTERS as SEATTLE_ADAPTERS
+ADAPTERS.update(SEATTLE_ADAPTERS)
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = json.loads((ROOT/'dist/sources.json').read_text(encoding='utf-8'))
@@ -66,7 +68,7 @@ if __name__=='__main__':
     parser.add_argument('--port',type=int,default=5281)
     args=parser.parse_args()
     server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
-    print(f'Scout Bay Area: http://127.0.0.1:{args.port}',flush=True)
+    print(f'Scout: http://127.0.0.1:{args.port}',flush=True)
     try:server.serve_forever()
     except KeyboardInterrupt:pass
     finally:server.server_close()

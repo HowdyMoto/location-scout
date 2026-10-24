@@ -72,3 +72,43 @@ These are catalog entries, **not implemented adapters**. A key or agreement alon
 4. NASA FIRMS MAP_KEY: satellite heat detections, separate from incident reports.
 5. Utility/provider agreements for outages; county-specific dispatch and evacuation API audits.
 6. Charging/parking partner feeds and additional municipal source audits.
+
+
+## Seattle / Puget Sound audit — 2026-10-24
+
+Official [Sound Transit OTD downloads](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) links the transit endpoints. [Metro developer resources and terms](https://kingcounty.gov/en/dept/metro/rider-tools/mobile-and-web-apps) provides the enhanced JSON feed and attribution requirement. The app preserves vehicle observation timestamps rather than substituting the GTFS header time. Old/missing observations are omitted.
+
+The former Traffic_Cameras_CDL service now returned a token requirement; the public SDOT_Traffic_Cameras replacement exposes locations but no image URLs. We link its markers to the official viewer and label them Directory. No protected camera endpoint or third-party credentials are used.
+
+All 19 public adapters returned valid responses during the live smoke test. An empty active-warning response is valid. WSDOT ferry parsing is implemented but cannot be verified end-to-end without a user-owned access code. Pierce Transit returned HTTP 401 and remains unconnected. Police and parking publication delay was measured from maximum source timestamps, not inferred from the page title.
+
+| Source | Status | Meaning / limitation |
+| --- | --- | --- |
+| [Aircraft](https://api.adsb.lol/docs) | integrated | ADS-B/MLAT reception is incomplete. ODbL attribution applies. |
+| [Earthquakes](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) | integrated | Recent seismic events, not earthquake prediction. |
+| [Weather stations](https://www.weather.gov/documentation/services-web-api) | integrated | Measured station conditions; observation age shown. |
+| [Tide gauges](https://api.tidesandcurrents.noaa.gov/api/prod/) | integrated | Preliminary water levels relative to MLLW; not water depth. |
+| [River & water gauges](https://api.waterdata.usgs.gov/docs/ogcapi/) | integrated | Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply. |
+| [Wildfire incidents](https://data-nifc.opendata.arcgis.com/) | integrated | Agency incident reports, not evacuation boundaries or guaranteed current perimeters. |
+| [Buoys & coastal conditions](https://www.ndbc.noaa.gov/) | integrated | Latest NDBC wind, wave and water-temperature reports. Missing observations remain missing. |
+| [Weather radar](https://www.weather.gov/gis/cloudgiswebservices) | integrated | Timestamped base reflectivity raster overlay. Echoes are not a forecast; blank tiles do not establish good weather. |
+| [Air quality model](https://open-meteo.com/en/docs/air-quality-api) | integrated | Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial. |
+| [Seattle fire & EMS calls](https://data.seattle.gov/d/kzjm-xkqj) | integrated | Past six hours of dispatches, not active-incident confirmation. |
+| [Seattle police call history](https://data.seattle.gov/d/33kz-ixgy) | integrated | Published call history can lag days. Last seven days, no officer tracking. |
+| [Paid parking snapshots](https://data.seattle.gov/d/hiyf-7edq) | integrated | Latest published payment-derived estimate. Not live space availability; publication may lag a day. |
+| [SDOT traffic cameras](https://www.arcgis.com/home/item.html?id=45a7e9f4d9584dbd9fdce1b951a7c4f6) | integrated | Active camera locations; imagery opens on the official SDOT traveler map. Registry is not live imagery. |
+| [Weather warnings](https://www.weather.gov/documentation/services-web-api) | integrated | Active NWS warnings and zone polygons intersecting Puget Sound. |
+| [King County Metro vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | integrated | Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers. |
+| [Sound Transit vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | integrated | Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers. |
+| [Community Transit vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | integrated | Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers. |
+| [Everett Transit vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | integrated | Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers. |
+| [Kitsap Transit vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | integrated | Observed GPS positions, refreshed every 30 seconds. Positions older than five minutes or without observation time are omitted. Route IDs are not necessarily public route numbers. |
+| [Washington State Ferries](https://www.wsdot.wa.gov/ferries/api/vessels/documentation/) | Configured adapter; needs WSDOT key | Adapter ready. Set WSDOT_API_KEY on the server; registration required. No simulated vessels. |
+| [Pierce Transit vehicles](https://www.soundtransit.org/help-contacts/business-information/open-transit-data-otd/otd-downloads) | access / research needed | Official linked Swiftly endpoint returned HTTP 401; provider authorization needed. |
+| [WSDOT incidents, speeds & highway cameras](https://wsdot.wa.gov/traffic/api/) | access / research needed | WSDOT Traveler API registration/access code needed. Separate feeds for incidents, cameras, mountain passes and travel times. |
+| [Seattle City Light outages](https://www.seattle.gov/city-light/outages) | access / research needed | Official outage viewer available; no supported anonymous API verified. PSE, Tacoma Power and Snohomish PUD require separate integrations. |
+| [Commercial vessels & AIS](https://aisstream.io/) | access / research needed | AISStream key and server-side WebSocket ingestion required; AIS coverage is incomplete. |
+| [Shared bikes & scooters](https://www.seattle.gov/transportation/projects-and-programs/programs/bike-program/bike-share) | access / research needed | Operator GBFS endpoints and access terms need verification; private rider trips are not mapped. |
+| [Measured air quality & smoke](https://docs.airnowapi.org/) | access / research needed | AirNow API key required. The connected CAMS layer is modeled air quality, not measured sensors. |
+| [Mountain snow & avalanche conditions](https://nwac.us/) | access / research needed | NWAC observations and forecasts are promising; stable API and reuse terms still need verification. |
+| [Whale sightings](https://www.orcanetwork.org/) | access / research needed | Sightings are delayed community reports, not real-time animal tracking. No supported open API verified. |
