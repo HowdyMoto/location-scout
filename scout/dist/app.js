@@ -3,11 +3,11 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const homes={bay:{center:[37.82,-122.25],zoom:10,name:'San Francisco Bay Area'},seattle:{center:[47.61,-122.33],zoom:11,name:'Seattle / Puget Sound'}};
 let activeRegion='seattle',home=homes.seattle,allLayers=[];
-let viewportRevision=0,viewportTimer,selectedPreset='all';
+let viewportTimer,selectedPreset='all';
 const map = L.map('map',{zoomControl:false,worldCopyJump:true,preferCanvas:true}).setView(home.center,home.zoom);
 L.control.zoom({position:'topright'}).addTo(map);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:19}).addTo(map).on('tileerror',()=>toast('Some basemap tiles are unavailable.'));
-let layers=[],catalog=[],selected=null,dark=false,toastTimer,loading=false;
+let layers=[],catalog=[],selected=null,dark=false,toastTimer,activeLoads=0;
 const moving=l=>Boolean(l.motion);
 const groups=['Safety','Motion','Roads','Earth','Water','City'];
 function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').style.display='none',5000)}
@@ -67,10 +67,10 @@ function health(){
   $('catalog-summary').textContent=`${layers.length} integrated sources · ${catalog.filter(s=>!s.supersededBy&&ScoutExplore.applies(s,currentBounds())).length-layers.length} additional sources cataloged`;
 }
 async function load(l){
-  l.loading=true;l.request=new AbortController();const requestedKey=l.queryKey;
+  l.loading=true;const request=l.request=new AbortController(),requestedKey=l.queryKey;
   try{
-    const r=await fetch(`/api/${l.id}${l.viewport?'?bbox='+encodeURIComponent(requestedKey):''}`,{signal:AbortSignal.any([l.request.signal,AbortSignal.timeout(70000)])});
-    if(!r.ok)throw Error('Backend unavailable');const d=await r.json();if(!Array.isArray(d.items))throw Error('Invalid response');if(l.viewport&&requestedKey!==l.queryKey)return;
+    const r=await fetch(`/api/${l.id}${l.viewport?'?bbox='+encodeURIComponent(requestedKey):''}`,{signal:AbortSignal.any([request.signal,AbortSignal.timeout(70000)])});
+    if(!r.ok)throw Error('Backend unavailable');const d=await r.json();if(!Array.isArray(d.items))throw Error('Invalid response');if(request.signal.aborted||(l.viewport&&requestedKey!==l.queryKey))return;
     if(moving(l)){
       l.trails??=new Map();
       for(const i of d.items){l.trails.set(i.id,ScoutMotion.merge(l.trails.get(i.id)||[],[...(d.history?.[i.id]||[]),i]))}
@@ -81,20 +81,29 @@ async function load(l){
     }
     Object.assign(l,{zoomRequired:false,coverageUnavailable:false},d);l.next=Date.now()+(['ok','partial'].includes(l.status)?l.refresh:Math.max(60,l.retryAfter||0))*1000;
   }catch{
-    if(l.viewport&&requestedKey!==l.queryKey)return;
+    if(request.signal.aborted||(l.viewport&&requestedKey!==l.queryKey))return;
     l.status=l.fetchedAt?'stale':'unavailable';l.error='Cannot reach the Scout data server. Start python scout/server.py and retry.';l.next=Date.now()+60000;
   }finally{
     l.loading=false;const el=$(`status-${l.id}`);if(el)el.textContent=status(l);if(l.on&&layers.includes(l))draw(l);feed();health();
     if(selected?.layer===l.id){const item=l.items.find(i=>i.id===selected.id);if(item)details(l,item);else{selected=null;$('detail').hidden=true;toast('That record is no longer in the latest source response.')}}
   }
 }
-async function refresh(force=false){
-  if(loading)return;loading=true;$('refresh').disabled=true;
-  const startedRevision=viewportRevision;
-  const queue=layers.filter(l=>!l.loading&&(force||Date.now()>=l.next)).sort((a,b)=>Number(moving(b))-Number(moving(a)));
-  async function worker(){while(queue.length){const l=queue.shift();if(layers.includes(l))await load(l)}}
-  try{await Promise.all(Array.from({length:Math.min(4,queue.length)},worker))}finally{loading=false;$('refresh').disabled=false;health();if(startedRevision!==viewportRevision)refresh()}
+function refresh(force=false){
+  // Rebuild the queue from the current view whenever a slot opens. A slow
+  // request must not hold the next region behind an entire previous batch.
+  if(force)layers.filter(l=>!l.loading).forEach(l=>l.next=0);
+  const queue=layers.filter(l=>!l.loading&&Date.now()>=l.next)
+    .sort((a,b)=>Number(moving(b))-Number(moving(a)));
+  while(activeLoads<4&&queue.length){
+    const l=queue.shift();activeLoads++;
+    load(l).finally(()=>{activeLoads--;refresh();health()});
+  }
+  $('refresh').disabled=activeLoads>0;
 }
+function cancelLoad(l){
+  if(l.loading){l.request?.abort();l.next=0}
+}
+
 function preset(p){selectedPreset=p;allLayers.forEach(l=>l.on=p==='all'?true:p==='default'?(moving(l)||l.kind==='Live'&&l.group==='Safety'):p==='move'?moving(l):['Earth','Water'].includes(l.group));document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===p));controls();sync()}
 document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>preset(b.dataset.preset));$('reset').onclick=()=>preset('all');$('refresh').onclick=()=>refresh(true);
 function currentBounds(){const b=map.getBounds();return ScoutExplore.normalize(b.getWest(),b.getSouth(),b.getEast(),b.getNorth())}
@@ -108,15 +117,15 @@ function applyViewport(){
  $('transit-credit').hidden=!regions.includes('seattle');
  document.querySelector('.coverage p').textContent='Feeds follow your map automatically. Global reception varies; city-specific transit and dispatch are currently connected in Seattle and the Bay Area. Delayed and modeled data stay labeled.';
  let changed=layers.map(l=>l.id).join()!==next.map(l=>l.id).join();
- for(const l of layers)if(!next.includes(l)){l.request?.abort();map.removeLayer(l.groupLayer)}
+ for(const l of layers)if(!next.includes(l)){cancelLoad(l);map.removeLayer(l.groupLayer)}
  layers=next;
  for(const l of layers.filter(l=>l.viewport)){
   if(!l.queryBounds||!ScoutExplore.contains(l.queryBounds,bounds)||Math.abs((l.queryZoom??map.getZoom())-map.getZoom())>=2){
    l.queryBounds=ScoutExplore.queryBounds(bounds);const key=l.queryBounds.join(',');l.queryZoom=map.getZoom();
-   if(key!==l.queryKey){l.request?.abort();l.queryKey=key;l.next=0;l.items=[];l.fetchedAt=null;l.status='loading';l.zoomRequired=false;l.coverageUnavailable=false;l.error=null;changed=true}
+   if(key!==l.queryKey){cancelLoad(l);l.queryKey=key;l.next=0;l.items=[];l.fetchedAt=null;l.status='loading';l.zoomRequired=false;l.coverageUnavailable=false;l.error=null;changed=true}
   }
  }
- if(changed){viewportRevision++;controls();sync();health();refresh()}
+ if(changed){controls();sync();health();refresh()}
  if(!changed)layers.filter(l=>l.on&&!moving(l)).forEach(draw);
  updateScenes();feed();
 }
