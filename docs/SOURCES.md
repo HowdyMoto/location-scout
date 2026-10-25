@@ -112,3 +112,16 @@ All 19 public adapters returned valid responses during the live smoke test. An e
 | [Measured air quality & smoke](https://docs.airnowapi.org/) | access / research needed | AirNow API key required. The connected CAMS layer is modeled air quality, not measured sensors. |
 | [Mountain snow & avalanche conditions](https://nwac.us/) | access / research needed | NWAC observations and forecasts are promising; stable API and reuse terms still need verification. |
 | [Whale sightings](https://www.orcanetwork.org/) | access / research needed | Sightings are delayed community reports, not real-time animal tracking. No supported open API verified. |
+
+
+## Live-motion update
+
+The map now distinguishes received reports from their buffered visualization. A 90-second playhead interpolates only between observations separated by at most two minutes, rejecting implausible speeds. This is not proof that a vehicle followed the straight segment between reports. Source reports and fetch times remain visible separately from map playback time. New safety-report highlighting means newly received by this browser, not necessarily a newly occurring event.
+
+[NOAA WMS](https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows?service=WMS&request=GetCapabilities) advertises actual observation timestamps; the latest 12 are used for radar playback. The renderer loads the next frame before swapping and holds the previous frame on tile errors.
+
+[AISStream](https://aisstream.io/documentation) is now an implemented optional adapter for both regions, not merely a candidate. It requires AISSTREAM_API_KEY, uses a compressed backend connection, subscribes to supported position-report variants and reconnects with jittered exponential backoff. The bounded viewport covers the two known regions. Unconfigured credentials produce an explicit access-needed state. Reception timestamps are labeled as such, and five-minute-old vessel reports are omitted. No authenticated ferry or AIS endpoint was tested because no keys were configured.
+
+Metro rider-facing route names are joined from the officially linked [GTFS schedule](https://metro.kingcounty.gov/GTFS/google_transit.zip), capped at 30 MB compressed / 2 MB route-table size and cached for 24 hours. Failure falls back to explicitly labeled internal route IDs rather than guessed route numbers.
+
+Sound Transit rail route labels are joined independently from its [official static feed](https://www.soundtransit.org/GTFS-rail/40_gtfs.zip), avoiding collisions between agency route identifiers.

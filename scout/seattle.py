@@ -3,6 +3,10 @@ import os
 import re
 import time
 import urllib.request
+import csv
+import io
+import zipfile
+import threading
 from google.transit import gtfs_realtime_pb2
 import feeds as f
 
@@ -26,7 +30,31 @@ def fire():
   if item:by[item['id']]=item
  return f.result(list(by.values()),'Seattle Fire public 911 calls, last six hours. Dispatch time is not incident-clearance time.'+(' Results capped at 2,000.' if len(rows)==2000 else ''))
 
-def parse_transit(data,agency):
+ROUTE_LOCK=threading.Lock()
+ROUTE_LABELS={}
+ROUTE_RETRY={}
+ROUTE_URLS={'metro':'https://metro.kingcounty.gov/GTFS/google_transit.zip','sound':'https://www.soundtransit.org/GTFS-rail/40_gtfs.zip'}
+
+def transit_route_labels(key):
+ """Small route table from the official static GTFS; never infer public route numbers."""
+ global ROUTE_RETRY,ROUTE_LABELS
+ with ROUTE_LOCK:
+  if time.time()<ROUTE_RETRY.get(key,0):return ROUTE_LABELS.get(key,{})
+  try:
+   request=urllib.request.Request(ROUTE_URLS[key],headers={'User-Agent':f.USER_AGENT})
+   with urllib.request.urlopen(request,timeout=20) as response:raw=response.read(30_000_001)
+   if len(raw)>30_000_000:raise ValueError('Static GTFS exceeds size limit')
+   with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+    info=archive.getinfo('routes.txt')
+    if info.file_size>2_000_000:raise ValueError('Route table too large')
+    with archive.open(info) as route_file:
+     rows=csv.DictReader(io.TextIOWrapper(route_file,encoding='utf-8-sig'))
+     labels={row['route_id']:row.get('route_short_name') or row.get('route_long_name') for row in rows}
+   ROUTE_LABELS[key]={k:v for k,v in labels.items() if v};ROUTE_RETRY[key]=time.time()+86400
+  except Exception:ROUTE_RETRY[key]=time.time()+300
+  return ROUTE_LABELS.get(key,{})
+
+def parse_transit(data,agency,route_labels=None):
  items=[]; omitted=0
  for entity in data.get('entity',[]):
   v=entity.get('vehicle',{}); p=v.get('position',{}); t=f.stamp(int(v['timestamp'])) if v.get('timestamp') else None
@@ -34,8 +62,10 @@ def parse_transit(data,agency):
   if not t or not -60_000 <= time.time()*1000-t <= 300_000:
    omitted+=1;continue
   vehicle=v.get('vehicle',{});trip=v.get('trip',{});route=trip.get('route_id',trip.get('routeId','unknown'))
+  route_label=(route_labels or {}).get(route)
+  route_text=f'Route {route_label}' if route_label else f'Route ID {route}'
   identifier=vehicle.get('id') or entity.get('id')
-  items.append(point(identifier,p.get('latitude'),p.get('longitude'),f"{agency} · {vehicle.get('label') or identifier}",f"Route ID {route} · {v.get('current_status','Status not supplied')} · stop ID {v.get('stop_id','unknown')}. Route IDs are provider identifiers, not necessarily the number on the vehicle. GPS observation, not a scheduled position.",t,summary=f'{agency} · route ID {route}',heading=p.get('bearing')))
+  items.append(point(identifier,p.get('latitude'),p.get('longitude'),f"{agency}{' · '+route_label if route_label else ''} · {vehicle.get('label') or identifier}",f"{route_text} · {v.get('current_status','Status not supplied')} · stop ID {v.get('stop_id','unknown')}. Route IDs are provider identifiers, not necessarily the number on the vehicle. GPS observation, not a scheduled position.",t,summary=f'{agency} · {route_text}',heading=p.get('bearing'),routeLabel=route_label))
  return f.result(items,f'Actual reported vehicle locations; {omitted} old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.')
 
 def transit(key):
@@ -49,7 +79,7 @@ def transit(key):
   message=gtfs_realtime_pb2.FeedMessage();message.ParseFromString(raw)
   if not message.HasField('header'):raise ValueError('Missing GTFS header')
   data=MessageToDict(message,preserving_proto_field_name=True)
- return parse_transit(data,agency)
+ return parse_transit(data,agency,transit_route_labels(key) if key in ROUTE_URLS else None)
 
 def ferries():
  key=os.environ.get('WSDOT_API_KEY')
@@ -58,7 +88,7 @@ def ferries():
  items=[]
  for r in rows:
   m=re.search(r'/Date\((\d+)',r.get('TimeStamp',''));t=int(m.group(1)) if m else f.stamp(r.get('TimeStamp'))
-  if not t or time.time()*1000-t>300_000:continue
+  if not t or not -60_000 <= time.time()*1000-t <= 300_000:continue
   items.append(point(r['VesselID'],r.get('Latitude'),r.get('Longitude'),r['VesselName'],f"{r.get('DepartingTerminalName','?')} → {r.get('ArrivingTerminalName','?')} · {r.get('Speed','?')} knots · {'At dock' if r.get('AtDock') else 'Underway'}. ETA is subject to change.",t,summary='Washington State Ferries',heading=r.get('Heading')))
  return f.result(items,'WSDOT vessel GPS reports; positions older than five minutes omitted.')
 

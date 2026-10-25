@@ -8,12 +8,15 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from feeds import ADAPTERS
 from seattle import ADAPTERS as SEATTLE_ADAPTERS
+import ships
 ADAPTERS.update(SEATTLE_ADAPTERS)
+ADAPTERS.update({'sea-ships':lambda:ships.snapshot('seattle'),'bay-ships':lambda:ships.snapshot('bay')})
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = json.loads((ROOT/'dist/sources.json').read_text(encoding='utf-8'))
 SOURCES = {s['id']:s for s in CATALOG if s['access']=='integrated'}
 CACHE = {}
+HISTORY = {}
 LOCKS = {key:threading.Lock() for key in SOURCES}
 
 
@@ -27,6 +30,8 @@ def load_source(key):
         try:
             value=ADAPTERS[key]()
             if not isinstance(value.get('items'),list):raise ValueError('Invalid adapter output')
+            if source.get('motion'):
+                value['history']=remember_positions(key,value['items'])
             response={**value,'id':key,'status':'partial' if value.get('partial') else 'ok','fetchedAt':int(time.time()*1000),'error':None}
             retry=time.time()+source['refresh']
         except Exception:
@@ -36,6 +41,23 @@ def load_source(key):
             retry=time.time()+60
         CACHE[key]={'response':response,'retryAt':retry}
         return response
+
+def remember_positions(key,items):
+    """Per-source lock is held by load_source; bound memory and keep actual timestamps."""
+    now=time.time()*1000
+    tracks=HISTORY.setdefault(key,{})
+    for item in items:
+        t=item.get('time')
+        if not isinstance(t,(int,float)) or not now-600000<t<=now+60000:continue
+        track=tracks.setdefault(item['id'],[])
+        if not track or t>track[-1]['time']:
+            track.append({k:item[k] for k in ('lat','lon','time','heading') if k in item})
+        tracks[item['id']]=[p for p in track if p['time']>now-600000][-40:]
+    for identifier in list(tracks):
+        if not tracks[identifier] or tracks[identifier][-1]['time']<now-300000:del tracks[identifier]
+    if len(tracks)>5000:
+        for identifier in sorted(tracks,key=lambda k:tracks[k][-1]['time'])[:len(tracks)-5000]:del tracks[identifier]
+    return {k:list(v) for k,v in tracks.items()}
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self,*args,**kwargs):
@@ -56,7 +78,7 @@ class Handler(SimpleHTTPRequestHandler):
             try:self.wfile.write(data)
             except (BrokenPipeError,ConnectionResetError):pass
             return
-        if path not in {'/','/index.html','/app.js','/style.css','/sources.json'}:
+        if path not in {'/','/index.html','/app.js','/motion.js','/live.js','/style.css','/sources.json'}:
             return self.send_error(404)
         super().do_GET()
     def end_headers(self):
@@ -71,4 +93,6 @@ if __name__=='__main__':
     print(f'Scout: http://127.0.0.1:{args.port}',flush=True)
     try:server.serve_forever()
     except KeyboardInterrupt:pass
-    finally:server.server_close()
+    finally:
+        ships.STOP.set()
+        server.server_close()

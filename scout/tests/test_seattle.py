@@ -17,6 +17,21 @@ class SeattleTests(unittest.TestCase):
   result=seattle.parse_transit(data,'Test')
   self.assertEqual([i['id'] for i in result['items']],['fresh'])
   self.assertEqual(result['items'][0]['time'],now*1000)
+ def test_transit_public_route_label_is_metadata_not_inferred(self):
+  row={'id':'bus','vehicle':{'timestamp':int(time.time()),'vehicle':{'id':'7100'},'position':{'latitude':47.6,'longitude':-122.3},'trip':{'route_id':'100001'}}}
+  item=seattle.parse_transit({'entity':[row]},'Metro',{'100001':'1'})['items'][0]
+  self.assertEqual(item['routeLabel'],'1')
+  self.assertIn('Route 1',item['summary'])
+  item=seattle.parse_transit({'entity':[row]},'Metro')['items'][0]
+  self.assertIsNone(item['routeLabel']);self.assertIn('Route ID 100001',item['summary'])
+ def test_ferry_provider_timestamp_and_expiration(self):
+  now=int(time.time()*1000)
+  def row(id,t):return {'VesselID':id,'VesselName':'Test ferry','Latitude':47.6,'Longitude':-122.3,'TimeStamp':f'/Date({t}-0700)/','Speed':12,'AtDock':False}
+  with patch.dict('os.environ',{'WSDOT_API_KEY':'fixture-only'}),patch.object(feeds,'fetch',return_value=[row(1,now-2000),row(2,now-301000),row(3,now+120000)]):
+   data=seattle.ferries()
+  self.assertEqual([i['id'] for i in data['items']],['1'])
+  self.assertEqual(data['items'][0]['time'],now-2000)
+  self.assertNotIn('fixture-only',str(data))
  def test_ferries_need_configuration_without_network(self):
   with patch.dict('os.environ',{},clear=True),patch.object(feeds,'fetch',side_effect=AssertionError('No network expected')):
    self.assertTrue(seattle.ferries()['configurationRequired'])

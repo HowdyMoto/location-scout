@@ -1,8 +1,27 @@
 # Location Scout — Seattle + SF Bay Area
 
-Explore public geographic data on one map, defaulting to **Seattle / Puget Sound**, with a region selector for the **SF Bay Area**. Seattle has **19 public adapters plus a configurable WSDOT ferry adapter**; the Bay Area retains its **18 adapters**. No simulated events.
+Explore public geographic data on one map, defaulting to **Seattle / Puget Sound**, with a region selector for the **SF Bay Area**. Seattle has **19 public adapters plus configurable WSDOT ferry and AIS vessel adapters**; the Bay Area retains its **18 public adapters**, plus optional AIS vessels. No simulated events.
 
 This is a researched starting inventory, not every regional API. Seattle's envelope is longitude −123.6…−121.2, latitude 46.8…48.8; the Bay Area envelope is −123.6…−121.2, 36.8…38.9. These include adjacent areas, not exact municipal boundaries. City dispatch feeds cover only their city.
+
+## Live motion experience
+
+Open **Live now** to watch individual vehicles instead of clustered snapshot dots. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
+
+- Directional aircraft, transit and vessel markers persist across updates. No extrapolation: missing reports hold their last position; long gaps and implausible jumps are not animated. Expired reports disappear.
+- **Follow a flight / Follow transit**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
+- **Pause** freezes displayed vehicle positions while data continues arriving. Resume returns to buffered playback. Reduced-motion preferences start playback paused.
+- Fading trails connect observed points, not road or rail geometry. Tracks are individually visible at zoom 10+, with clusters when zoomed further out.
+- **Radar loop** cycles the latest 12 frames advertised by NOAA, showing each observation time. New tiles load before replacing the previous frame; failed loads retain the old frame with an explicit error.
+- The activity sidebar rotates across enabled sources, so aircraft do not hide dispatches and transit. Newly received safety reports pulse briefly and retain their original report timestamps. Initial history does not trigger arrival pulses.
+- Metro and Sound Transit route names come from `routes.txt` in the official GTFS download, cached for a day. If metadata is unavailable, the app explicitly shows the provider's internal route ID.
+
+### Optional vessel feeds
+
+Neither vessel credential was configured during implementation; both adapters are implemented and fixture-tested, but their authenticated network paths remain unverified.
+
+Set `WSDOT_API_KEY` for Washington State Ferries and `AISSTREAM_API_KEY` for [AISStream](https://aisstream.io/). Set these in the server process environment and restart; `.env` files are not loaded automatically. Keys never go to the browser or public repository. AIS uses one compressed server-side WebSocket for both regions, bounded in-memory storage and exponential reconnect backoff. AIS timestamps identify reception time, which may differ from the vessel's sensor observation time.
+
 
 ## Run
 
@@ -30,7 +49,7 @@ Open **http://127.0.0.1:5281**. Choose another port with `--port 5282`. On Windo
 
 ## Seattle / Puget Sound
 
-- **Moving vehicles:** King County Metro, Sound Transit, Community Transit, Everett Transit and Kitsap Transit GPS feeds, plus aircraft. Refresh every 30 seconds; transit reports expire after five minutes, aircraft after two. At zoom level 12+, short trails connect up to six observations from the past three minutes. Lines do not represent roads or predicted travel.
+- **Moving vehicles:** King County Metro, Sound Transit, Community Transit, Everett Transit and Kitsap Transit GPS feeds, plus aircraft. Refresh every 30 seconds; transit reports expire after five minutes, aircraft after two. At zoom level 10+, vehicles move through buffered observations; short trails show the past three minutes (transit trails appear at zoom 12+). Lines do not represent roads or predicted travel.
 - **Safety:** Seattle fire / EMS calls from the last six hours; active NWS weather warnings; NIFC wildfire reports; seven days of earthquakes.
 - **Water and weather:** nine weather stations, five tide gauges, USGS river gauges, NDBC buoy/coastal conditions, NOAA radar and eight modeled air-quality samples.
 - **City context:** 393 active SDOT camera locations during verification, linking to the official camera viewer; delayed police call history and paid-parking snapshots, off by default. Parking is derived from payments, not live available-space sensors.
@@ -72,20 +91,25 @@ See [the source audit](docs/SOURCES.md) for provider links, access requirements 
 - `scout/server.py`: loopback-only Python HTTP server, fixed adapter routes, per-source cache and locks; no generic proxy.
 - `scout/feeds.py`: provider adapters and normalized records. Coordinates are validated and bounded; redacted locations are not reconstructed.
 - `scout/seattle.py`: Seattle-specific feeds and explicit regional configuration for shared adapters.
+- `scout/ships.py`: optional server-side AIS receiver, never a browser WebSocket.
+- `scout/dist/motion.js`: pure observation interpolation and activity balancing, tested with Node.
+- `scout/dist/live.js`: persistent markers, following, pause controls and radar playback.
 - `scout/dist/sources.json`: source registry and access inventory, shared by backend and UI.
 - `scout/dist/`: buildless Leaflet UI, zoom-dependent clusters, presets, regional shortcuts, source details, saved views and city/coordinate search.
 - `scout/tests/test_feeds.py`: deterministic adapter/cache tests; no network needed.
 
-Python dependencies are `tzdata` for Pacific timestamps and `gtfs-realtime-bindings` / protobuf for transit feeds. Backend fetches avoid browser CORS restrictions. The public layers need no personal API keys; the optional ferry adapter requires WSDOT_API_KEY. BART explicitly publishes the shared legacy API key used here. No credentials are stored in source. Saved map views use browser localStorage.
+Python dependencies are `tzdata` for Pacific timestamps and `gtfs-realtime-bindings` / protobuf for transit feeds, and `websockets` for optional AIS ingestion. Backend fetches avoid browser CORS restrictions. The public layers need no personal API keys; the optional ferry adapter requires WSDOT_API_KEY. BART explicitly publishes the shared legacy API key used here. No credentials are stored in source. Saved map views use browser localStorage.
 
 ## Verification
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s scout/tests -v
+node --test scout/tests/motion.test.cjs
 node --check scout/dist/app.js
+node --check scout/dist/live.js
 ```
 
-All 18 Bay Area sources and 19 public Seattle sources returned successful responses on 2026-10-24. All 15 regression tests passed; browser checks covered region switching, source filtering and saved-view restoration. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
+All 18 Bay Area sources and 19 public Seattle sources returned successful responses on 2026-10-24. The live-motion update passes 21 Python regression tests and nine JavaScript motion tests; browser checks covered region switching, source filtering and saved-view restoration. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
 
 ## Data terms and limits
 

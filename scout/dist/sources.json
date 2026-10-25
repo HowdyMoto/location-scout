@@ -65,7 +65,8 @@
     "notes": "ADS-B/MLAT reception is incomplete. ODbL attribution applies.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "bay"
+    "region": "bay",
+    "motion": true
   },
   {
     "id": "bikes",
@@ -292,14 +293,22 @@
     "region": "bay"
   },
   {
-    "id": "ais",
-    "name": "Vessel positions",
+    "id": "bay-ships",
+    "name": "Ships & harbor traffic",
     "group": "Motion",
-    "access": "API key required",
+    "access": "integrated",
     "source": "AISStream",
     "url": "https://aisstream.io/",
-    "notes": "WebSocket AIS observations; requires an account/key and persistent stream adapter. Coverage is receiver-dependent.",
-    "region": "bay"
+    "notes": "Server-side WebSocket adapter ready. Requires AISSTREAM_API_KEY. Position timestamps are reception times; coverage and upstream delay vary.",
+    "region": "bay",
+    "kind": "Reception",
+    "motion": true,
+    "refresh": 10,
+    "maxAge": 300,
+    "defaultOn": true,
+    "icon": "⛴",
+    "color": "#238c9d",
+    "coverage": "San Francisco Bay"
   },
   {
     "id": "airnow",
@@ -480,7 +489,8 @@
     "notes": "ADS-B/MLAT reception is incomplete. ODbL attribution applies.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "seattle"
+    "region": "seattle",
+    "motion": true
   },
   {
     "id": "sea-quake",
@@ -718,7 +728,8 @@
     "access": "integrated",
     "icon": "▣",
     "color": "#439879",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-sound",
@@ -735,7 +746,8 @@
     "access": "integrated",
     "icon": "▣",
     "color": "#578bc0",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-community",
@@ -752,7 +764,8 @@
     "access": "integrated",
     "icon": "▣",
     "color": "#9775be",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-everett",
@@ -769,7 +782,8 @@
     "access": "integrated",
     "icon": "▣",
     "color": "#c08b43",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-kitsap",
@@ -786,7 +800,8 @@
     "access": "integrated",
     "icon": "▣",
     "color": "#399ebc",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-ferries",
@@ -796,14 +811,15 @@
     "kind": "Live",
     "url": "https://www.wsdot.wa.gov/ferries/api/vessels/documentation/",
     "notes": "Adapter ready. Set WSDOT_API_KEY on the server; registration required. No simulated vessels.",
-    "refresh": 30,
+    "refresh": 10,
     "maxAge": 300,
     "defaultOn": false,
     "source": "WSDOT",
     "access": "integrated",
     "icon": "⛴",
     "color": "#399ebc",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "coverage": "Seattle / Puget Sound; provider coverage varies",
+    "motion": true
   },
   {
     "id": "sea-pierce",
@@ -858,20 +874,21 @@
   },
   {
     "id": "sea-ships",
-    "name": "Commercial vessels & AIS",
+    "name": "Ships & harbor traffic",
     "region": "seattle",
     "group": "Motion",
-    "kind": "Candidate",
+    "kind": "Reception",
     "url": "https://aisstream.io/",
-    "notes": "AISStream key and server-side WebSocket ingestion required; AIS coverage is incomplete.",
-    "refresh": 60,
-    "maxAge": 0,
-    "defaultOn": false,
-    "source": "City of Seattle",
-    "access": "access / research needed",
-    "icon": "◎",
-    "color": "#399ebc",
-    "coverage": "Seattle / Puget Sound; provider coverage varies"
+    "notes": "Server-side WebSocket adapter ready. Requires AISSTREAM_API_KEY. Position timestamps are reception times; coverage and upstream delay vary.",
+    "refresh": 10,
+    "maxAge": 300,
+    "defaultOn": true,
+    "source": "AISStream",
+    "access": "integrated",
+    "icon": "⛴",
+    "color": "#238c9d",
+    "coverage": "Seattle / Puget Sound",
+    "motion": true
   },
   {
     "id": "sea-scooters",

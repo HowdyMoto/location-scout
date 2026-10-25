@@ -328,7 +328,7 @@ def radar():
             if dim is not None:
                 frame=dim.attrib.get('default')
                 if not stamp(frame):raise ValueError('Radar frame time missing')
-                return result([],f'NOAA base reflectivity mosaic frame: {frame}. Radar echoes are not a forecast. Blank imagery can indicate no echo or unavailable radar.',raster={'url':url,'layer':'conus_bref_qcd','time':frame})
+                return result([],f'NOAA base reflectivity mosaic frame: {frame}. Radar echoes are not a forecast. Blank imagery can indicate no echo or unavailable radar.',raster={'url':url,'layer':'conus_bref_qcd','time':frame,'frames':[t.strip() for t in (dim.text or '').split(',') if stamp(t.strip())][-12:]})
     raise ValueError('Radar time dimension unavailable')
 
 ADAPTERS.update(buoys=buoys,radar=radar)

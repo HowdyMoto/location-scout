@@ -1,0 +1,12 @@
+const test=require('node:test');const assert=require('node:assert/strict');const M=require('../dist/motion.js');
+const t=1_000_000;
+const a={lat:47.6,lon:-122.3,time:t},b={lat:47.61,lon:-122.3,time:t+30000};
+test('interpolates only between timestamped reports',()=>{const p=M.sample([a,b],t+15000);assert.equal(p.state,'moving');assert.ok(Math.abs(p.lat-47.605)<1e-9);assert.equal(p.heading,0)});
+test('holds last position and never extrapolates',()=>{const p=M.sample([a,b],t+120000);assert.equal(p.lat,b.lat);assert.equal(p.time,b.time);assert.equal(p.state,'holding')});
+test('initial playback is explicitly buffering',()=>{assert.equal(M.sample([a],t-1).state,'buffering')});
+test('long report gaps are not animated',()=>{const p=M.sample([a,{...b,time:t+180000}],t+15000);assert.equal(p.lat,a.lat);assert.equal(p.state,'gap')});
+test('teleports are not interpolated',()=>{const p=M.sample([a,{...b,lat:48.6}],t+15000,65);assert.equal(p.state,'gap')});
+test('stationary observations do not count as movement',()=>{assert.equal(M.sample([a,{...a,time:t+30000}],t+15000).state,'stationary')});
+test('history sorts, deduplicates, prunes and rejects future timestamps',()=>{const result=M.merge([b,a],[a,{...a,time:t-700000},{...a,time:t+1000000}],t+30000);assert.deepEqual(result,[a,b])});
+test('activity is balanced across sources instead of dominated by aircraft',()=>{assert.deepEqual(M.balanced([['fire1','fire2'],['air1','air2','air3'],['bus1']],5),['fire1','air1','bus1','fire2','air2'])});
+test('empty history is safe',()=>{assert.equal(M.sample([],t),null)});
