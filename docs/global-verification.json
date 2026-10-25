@@ -1,0 +1,678 @@
+{
+  "checkedAt": "2026-10-25T19:24:33Z",
+  "checks": [
+    {
+      "check": "police",
+      "status": "ok",
+      "records": 2465,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956091384,
+      "note": "Rolling 48h; 10-minute publication cycle plus 10-minute delay. 869 location-redacted records omitted.",
+      "error": null
+    },
+    {
+      "check": "fire",
+      "status": "ok",
+      "records": 1375,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956091842,
+      "note": "Daily publication; last 72h of calls, deduplicated by call number.",
+      "error": null
+    },
+    {
+      "check": "civic",
+      "status": "ok",
+      "records": 4958,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093139,
+      "note": "Last 72h; daily dataset, not live dispatch. Capped at 5,000 reports.",
+      "error": null
+    },
+    {
+      "check": "bikes",
+      "status": "ok",
+      "records": 648,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264350,
+      "note": "Lyft Bike / Bay Wheels station availability. Station reports can lag the feed timestamp.",
+      "error": null
+    },
+    {
+      "check": "bart",
+      "status": "ok",
+      "records": 49,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264465,
+      "note": "BART station departure predictions via the documented shared public key. Markers are stations, not moving trains.",
+      "error": null
+    },
+    {
+      "check": "cameras",
+      "status": "ok",
+      "records": 764,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956092001,
+      "note": "Caltrans District 4. Registry timestamps are not image timestamps.",
+      "error": null
+    },
+    {
+      "check": "signs",
+      "status": "ok",
+      "records": 76,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956091682,
+      "note": "Caltrans District 4. Provider timestamps shown; schedules and messages may change.",
+      "error": null
+    },
+    {
+      "check": "closures",
+      "status": "ok",
+      "records": 1277,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093226,
+      "note": "Caltrans District 4. Provider timestamps shown; schedules and messages may change.",
+      "error": null
+    },
+    {
+      "check": "alerts",
+      "status": "ok",
+      "records": 7,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093996,
+      "note": "Active NWS alerts. 0 zone geometries unavailable; unmapped alerts may exist.",
+      "error": null
+    },
+    {
+      "check": "weather",
+      "status": "ok",
+      "records": 10,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956092592,
+      "note": "10/10 stations returned; 0 unavailable.",
+      "error": null
+    },
+    {
+      "check": "tides",
+      "status": "ok",
+      "records": 7,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093371,
+      "note": "7/7 gauges; 0 unavailable. Latest preliminary observations, not tide predictions.",
+      "error": null
+    },
+    {
+      "check": "bay-ships",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": true,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264233,
+      "note": "Set AISSTREAM_API_KEY on the server to enable streamed ship positions. No vessel data is simulated.",
+      "error": null
+    },
+    {
+      "check": "sea-weather",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093540,
+      "note": "9/9 stations returned; 0 unavailable.",
+      "error": null
+    },
+    {
+      "check": "sea-tides",
+      "status": "ok",
+      "records": 5,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956093600,
+      "note": "5/5 gauges; 0 unavailable. Latest preliminary observations, not tide predictions.",
+      "error": null
+    },
+    {
+      "check": "sea-fire",
+      "status": "ok",
+      "records": 58,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269112,
+      "note": "Seattle Fire public 911 calls, last six hours. Dispatch time is not incident-clearance time.",
+      "error": null
+    },
+    {
+      "check": "sea-police",
+      "status": "ok",
+      "records": 2168,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956095614,
+      "note": "Last seven days of published call history, deduplicated by event. Publication can lag by days. No officer positions. Input capped at 5,000 unit rows.",
+      "error": null
+    },
+    {
+      "check": "sea-parking",
+      "status": "ok",
+      "records": 250,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956095196,
+      "note": "Latest published minute: 2026-10-24T21:59:00.000 Pacific. Publication may lag a day or more; payment-derived occupancy, not live availability.",
+      "error": null
+    },
+    {
+      "check": "sea-cameras",
+      "status": "ok",
+      "records": 393,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956094546,
+      "note": "Camera locations from the city registry, refreshed daily. Imagery is viewed on the official SDOT map; these markers are not live traffic measurements.",
+      "error": null
+    },
+    {
+      "check": "sea-alerts",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956094412,
+      "note": "Active Washington alerts intersecting the regional envelope. 0 zone geometries unresolved; other alerts may exist.",
+      "error": null
+    },
+    {
+      "check": "sea-metro",
+      "status": "ok",
+      "records": 364,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264885,
+      "note": "Actual reported vehicle locations; 8 old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "sea-sound",
+      "status": "ok",
+      "records": 36,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264782,
+      "note": "Actual reported vehicle locations; 0 old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "sea-community",
+      "status": "ok",
+      "records": 77,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264770,
+      "note": "Actual reported vehicle locations; 0 old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "sea-everett",
+      "status": "ok",
+      "records": 17,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265168,
+      "note": "Actual reported vehicle locations; 0 old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "sea-kitsap",
+      "status": "ok",
+      "records": 47,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264967,
+      "note": "Actual reported vehicle locations; 0 old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "sea-ferries",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": true,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264891,
+      "note": "Set WSDOT_API_KEY on the server to enable actual ferry GPS positions.",
+      "error": null
+    },
+    {
+      "check": "sea-ships",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": true,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264892,
+      "note": "Set AISSTREAM_API_KEY on the server to enable streamed ship positions. No vessel data is simulated.",
+      "error": null
+    },
+    {
+      "check": "world-air",
+      "status": "ok",
+      "records": 83,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265355,
+      "note": "Regional ADS-B receiver query; reception coverage varies. Positions older than 2 minutes omitted. Data: adsb.fi \u2014 https://adsb.fi \u00b7 personal, noncommercial use only.",
+      "error": null
+    },
+    {
+      "check": "world-quake",
+      "status": "ok",
+      "records": 3,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264970,
+      "note": "Last 7 days, filtered to the selected regional envelope.",
+      "error": null
+    },
+    {
+      "check": "world-buoys",
+      "status": "ok",
+      "records": 15,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956264981,
+      "note": "NOAA NDBC latest available buoy/coastal reports. Some stations do not measure waves; observation ages vary.",
+      "error": null
+    },
+    {
+      "check": "world-airquality",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265693,
+      "note": "Model estimates, not sensor measurements. \u00a9 CAMS / Open-Meteo \u00b7 CC BY 4.0; free API for noncommercial use.",
+      "error": null
+    },
+    {
+      "check": "world-radar",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265170,
+      "note": "RainViewer radar mosaics from the past two hours. Frame times are mosaic generation times; individual radars can be older. Blank areas can mean no rain OR no coverage. Personal/educational use; see provider terms.",
+      "error": null
+    },
+    {
+      "check": "world-rivers",
+      "status": "ok",
+      "records": 26,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265503,
+      "note": "Gage height observations within 24h; one latest reading per site.",
+      "error": null
+    },
+    {
+      "check": "world-wildfire",
+      "status": "ok",
+      "records": 0,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265620,
+      "note": "Current WFIGS incident feed; no fixed reporting interval. Extinguished incidents omitted.",
+      "error": null
+    },
+    {
+      "check": "world-weather",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265863,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "hsl-vehicles",
+      "status": "ok",
+      "records": 533,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956266627,
+      "note": "HSL. Actual reported positions; 0 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "mbta-vehicles",
+      "status": "ok",
+      "records": 381,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956265813,
+      "note": "MBTA. Actual reported positions; 9 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "adelaide-vehicles",
+      "status": "ok",
+      "records": 109,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956266424,
+      "note": "Adelaide Metro \u2013 Department for Infrastructure and Transport, South Australia. Actual reported positions; 0 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "entur-vehicles",
+      "status": "ok",
+      "records": 687,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956267017,
+      "note": "Entur / participating Norwegian operators. Actual reported positions; 2281 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "rio-vehicles",
+      "status": "ok",
+      "records": 1591,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956266838,
+      "note": "Rio de Janeiro SMTR. Actual reported positions; 1 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "bordeaux-vehicles",
+      "status": "ok",
+      "records": 175,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956267628,
+      "note": "TBM / Bordeaux M\u00e9tropole. Actual reported positions; 15 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "renfe-vehicles",
+      "status": "ok",
+      "records": 292,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956267957,
+      "note": "Renfe Cercan\u00edas. Actual reported positions; 0 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "tokyo-bikes",
+      "status": "ok",
+      "records": 1931,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269106,
+      "note": "Docomo Bike Share / ODPT. Station availability reports; 0 unmatched, old or untimestamped reports omitted. Reports older than five minutes are marked stale; older than fifteen minutes are omitted. Availability changes can include maintenance and rebalancing, not only trips.",
+      "error": null
+    },
+    {
+      "check": "buenosaires-bikes",
+      "status": "ok",
+      "records": 392,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270261,
+      "note": "Ecobici Buenos Aires. Station availability reports; 0 unmatched, old or untimestamped reports omitted. Reports older than five minutes are marked stale; older than fifteen minutes are omitted. Availability changes can include maintenance and rebalancing, not only trips.",
+      "error": null
+    },
+    {
+      "check": "toronto-bikes",
+      "status": "ok",
+      "records": 1068,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269484,
+      "note": "Bike Share Toronto. Station availability reports; 3 unmatched, old or untimestamped reports omitted. Reports older than five minutes are marked stale; older than fifteen minutes are omitted. Availability changes can include maintenance and rebalancing, not only trips.",
+      "error": null
+    },
+    {
+      "check": "la-buses",
+      "status": "partial",
+      "records": 1129,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269122,
+      "note": "LA Metro public vehicle stream. Connecting or interrupted; individual observation timestamps retained. Old or untimestamped positions are omitted. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "la-rail",
+      "status": "partial",
+      "records": 82,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269131,
+      "note": "LA Metro public vehicle stream. Connecting or interrupted; individual observation timestamps retained. Old or untimestamped positions are omitted. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "fi-ships",
+      "status": "partial",
+      "records": 472,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269141,
+      "note": "Fintraffic / Digitraffic AIS, CC BY 4.0. Connecting or interrupted; retrying. Finnish receiver coverage only. Position-feed timestamps retained; old reports omitted. Ships hold when updates stop; no extrapolation.",
+      "error": null
+    },
+    {
+      "check": "nl-vehicles",
+      "status": "ok",
+      "records": 1603,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270441,
+      "note": "OVapi / Stichting OpenGeo. Actual reported positions; 86 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "canberra-rail",
+      "status": "ok",
+      "records": 4,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270362,
+      "note": "Canberra Metro / ACT Government. Actual reported positions; 0 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    {
+      "check": "iss-orbit",
+      "status": "ok",
+      "records": 1,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269919,
+      "note": "Where the ISS at? / Bill Shupp. Orbital model estimates, timestamped by the provider. Playback interpolates received estimates with a 90-second delay; it does not predict future positions.",
+      "error": null
+    },
+    {
+      "check": "world-events",
+      "status": "partial",
+      "records": 0,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956269921,
+      "note": "NASA EONET recent open events. One latest point per event; dates and extents are approximate. Not a real-time emergency feed. 1 unsupported, old or invalid events omitted.",
+      "error": null
+    },
+    {
+      "check": "weather: Africa",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270285,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: Asia",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270647,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: Europe",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956270956,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: North America",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956271284,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: South America",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956271614,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: Oceania",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956271952,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "weather: Date line",
+      "status": "ok",
+      "records": 9,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956272270,
+      "note": "Nine model samples across this view. Open-Meteo attribution / CC BY 4.0; free API is noncommercial.",
+      "error": null
+    },
+    {
+      "check": "aircraft: London",
+      "status": "ok",
+      "records": 46,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956271584,
+      "note": "Regional ADS-B receiver query; reception coverage varies. Positions older than 2 minutes omitted. Data: adsb.fi \u2014 https://adsb.fi \u00b7 personal, noncommercial use only.",
+      "error": null
+    },
+    {
+      "check": "aircraft: Singapore",
+      "status": "ok",
+      "records": 3,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956272659,
+      "note": "Regional ADS-B receiver query; reception coverage varies. Positions older than 2 minutes omitted. Data: adsb.fi \u2014 https://adsb.fi \u00b7 personal, noncommercial use only.",
+      "error": null
+    },
+    {
+      "check": "aircraft: Cape Town",
+      "status": "ok",
+      "records": 2,
+      "configurationRequired": false,
+      "zoomRequired": false,
+      "fetchedAt": 1792956273761,
+      "note": "Regional ADS-B receiver query; reception coverage varies. Positions older than 2 minutes omitted. Data: adsb.fi \u2014 https://adsb.fi \u00b7 personal, noncommercial use only.",
+      "error": null
+    }
+  ],
+  "streamRecheck": [
+    {
+      "check": "la-buses",
+      "status": "ok",
+      "records": 1137,
+      "note": "LA Metro public vehicle stream. Connected; individual observation timestamps retained. Old or untimestamped positions are omitted. No position extrapolation.",
+      "fetchedAt": 1792956321224
+    },
+    {
+      "check": "la-rail",
+      "status": "ok",
+      "records": 83,
+      "note": "LA Metro public vehicle stream. Connected; individual observation timestamps retained. Old or untimestamped positions are omitted. No position extrapolation.",
+      "fetchedAt": 1792956321260
+    },
+    {
+      "check": "fi-ships",
+      "status": "ok",
+      "records": 483,
+      "note": "Fintraffic / Digitraffic AIS, CC BY 4.0. Connected. Finnish receiver coverage only. Position-feed timestamps retained; old reports omitted. Ships hold when updates stop; no extrapolation.",
+      "fetchedAt": 1792956321277
+    }
+  ],
+  "requirements": [
+    {
+      "requirement": "Explore the globe without selecting data regions",
+      "evidence": "Browser coordinate searches: San Francisco, Seattle, Tokyo, Cape Town and Fiji/date line; regional layers activated and previous regional controls disappeared. Six-continent weather and date-line API checks passed.",
+      "result": "verified"
+    },
+    {
+      "requirement": "Default to showing available sources",
+      "evidence": "Fresh browser reload opened World explorer with all 51 layer checkboxes checked.",
+      "result": "verified"
+    },
+    {
+      "requirement": "Prioritize actual movement",
+      "evidence": "19 public motion-capable layers plus three credential-dependent vessel layers. Timestamped transit, aircraft and Finnish AIS verified in source-specific audits. ISS is separately labeled modeled. Current Follow ISS showed moving playback.",
+      "result": "verified"
+    },
+    {
+      "requirement": "Make discovery useful and enjoyable",
+      "evidence": "World destination markers, local-time cards, fresh activity counts, activity-aware Surprise me, Follow flight/transit/ship/ISS, trails, pause/resume and radar playback are implemented. Browser verified world return, explorer opening, ISS following and pause/resume; prior source audits record flight/transit/ship and radar playback.",
+      "result": "verified"
+    },
+    {
+      "requirement": "Do not fake freshness, movement or coverage",
+      "evidence": "Date preservation, stale/partial/access labels, model labels, bounded interpolation, no extrapolation, speed/gap rejection and date-line behavior covered by fixtures and inspected browser details. Three optional vessel integrations clearly report access required.",
+      "result": "verified"
+    },
+    {
+      "requirement": "Public repository with reproducible local prototype",
+      "evidence": "Public HowdyMoto/location-scout repository; setup and dependencies documented in README and scout/requirements.txt; loopback server verified at port 5284.",
+      "result": "verified"
+    }
+  ],
+  "limits": [
+    "51 configured integrated layers includes three optional credential-dependent vessel feeds; these are not live-verified without keys.",
+    "Global exploration does not imply complete local transit, dispatch, vessel or sensor coverage in every place.",
+    "Aircraft requires regional zoom and receiver coverage; a world view is not a worldwide aircraft census.",
+    "Motion uses a 90-second buffer; ISS, weather and air quality are explicitly modeled; historic/dated reports are not current incidents.",
+    "Canberra public light-rail endpoint is deprecated but was returning fresh reports.",
+    "Public production hosting, commercial data licenses, provider credentials and new city adapters remain follow-up work; no deployment was requested."
+  ]
+}

@@ -291,3 +291,12 @@ Scout shares one global response per 15 minutes across map views. It selects the
 Live verification returned 47 recent open events (34 wildfires, three severe storms and ten sea/lake-ice events). The integrated endpoint retained 46 latest valid points and reported one omitted event. A Pacific date-line view returned zero matching reports without borrowing records from other areas. Fixture tests cover newest-geometry selection, timestamp preservation, old/future/invalid/closed reports, polygon handling and shared fetches across views.
 
 Browser verification activated the layer from a coordinate search near a dated storm report, showed its original report time separately from fetch time, and exposed the correct NASA event-record link. The detail remained open while zooming out; no console errors were reported.
+
+
+### Global exploration acceptance check
+
+The final prototype check covers 51 active catalog layers (including three optional credential-dependent vessel layers), 22 motion-capable layers and 14 catalog destinations plus home/sky discovery places. All 61 API checks completed: seven weather views covered six continents and the date line; regional aircraft checks succeeded at London, Singapore and Cape Town. Initial partial statuses for LA bus/rail and Finnish AIS resolved to connected on recheck. EONET's partial result explicitly identifies an omitted unsupported/old report. Optional vessel credentials remain absent and are not counted as live-verified coverage.
+
+The browser opened on World view with all 51 layer controls enabled. Coordinate searches automatically switched SF, Seattle, Tokyo, Cape Town and Fiji/date-line sources without a region selection. Tokyo showed fresh bike availability, Cape Town aircraft loaded, and Fiji showed nine modeled weather samples. Follow ISS showed moving playback; pause set motion to zero while feeds continued and resume restored playback. World view and the discovery dialog remained accessible. Earlier sections record source-specific movement, follow, radar, and availability-change checks. This verifies the global exploration prototype, not exhaustive worldwide data coverage or public production hosting.
+
+The timestamped API results and requirement evidence are preserved in [global-verification.json](global-verification.json). Provider counts and availability are point-in-time evidence and will change.
