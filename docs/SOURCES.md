@@ -254,3 +254,18 @@ World-explorer cards use already-fetched source snapshots to count reports withi
 Movement counts use the same 90-second interpolation and gap/speed rejection as map playback. Surprise me prefers destinations with observed movement, then fresh vehicles, then fresh station reports, and falls back to other destinations when no checked activity is available. This does not claim a quiet/unchecked area has no activity. Badges update in place while the dialog is open, without extra network requests or reordering focused controls.
 
 Browser verification showed badges updating in place for transit, ships and bikes, an unavailable Bordeaux feed, and unchecked sky views. Surprise me opened the Netherlands, where moving playback was visible. No browser console errors were reported. Five new deterministic cases cover geographic filtering, stale/future timestamps, stationary and impossible tracks, date-line distance, unavailable/unchecked sources and activity-based selection.
+
+
+### Canberra light rail — public legacy feed
+
+Official catalog: https://www.data.act.gov.au/Transport/Canberra-Metro-Light-Rail-Transit-Feed-Vehicle-Upd/4f7h-bvpk . Source feed: https://files.transport.act.gov.au/feeds/lightrail.pb . Catalog metadata identifies Canberra Metro / ACT Government, a 15-second update frequency and CC BY-SA 4.0. The map links that attribution/license and identifies filtering and interpolation. This is light rail only, not bus coverage.
+
+The developer page (https://www.transport.act.gov.au/contact-us/information-for-developers) marks the legacy feed deprecated, although it returned two fresh light-rail positions during the early-morning verification. It remains explicitly described as a legacy feed, with standard stale/unavailable handling. The replacement MyWay+ endpoint returned HTTP 401 and requires separately requested developer credentials; the published access guide is https://www.transport.act.gov.au/__data/assets/pdf_file/0005/2865398/MyWayPlus-GTFS-developer-access-guide-v1.2.pdf . No account was created and no credentials were fabricated. The catalog's specific share-alike license is retained even though the general developer page links a BY license.
+
+Canberra is now an exploration destination and its feed activates from map bounds. The existing GTFS adapter discards old, future and out-of-bounds reports and uses received position history for playback.
+
+### Queensland follow-up candidate
+
+Official source documentation: https://translink.com.au/about-translink/open-data . The public SEQ feed https://gtfsrt.api.translink.com.au/api/realtime/SEQ/VehiclePositions returned 151 fresh positions. It is not activated in Scout yet: https://translink.com.au/about-translink/open-data/terms-and-conditions requires current developer contact details, and the source documentation says realtime feeds must be used with GTFS schedules. Follow-up should complete the developer-contact requirement and route metadata integration before activation. No contact details were submitted or messages sent.
+
+Canberra verification: both fresh vehicles (LRV15 and LRV17) changed coordinates between integrated snapshots. The browser activated the layer from a coordinate search, showed two moving vehicles after the playback buffer filled, and followed LRV15. Provider/license attribution was visible; no console errors were reported.

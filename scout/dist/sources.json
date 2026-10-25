@@ -1633,5 +1633,41 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true
+  },
+  {
+    "id": "canberra-rail",
+    "name": "Canberra light rail",
+    "source": "Canberra Metro / ACT Government",
+    "endpoint": "https://files.transport.act.gov.au/feeds/lightrail.pb",
+    "url": "https://www.data.act.gov.au/Transport/Canberra-Metro-Light-Rail-Transit-Feed-Vehicle-Upd/4f7h-bvpk",
+    "bounds": [
+      148.7,
+      -35.7,
+      149.5,
+      -35
+    ],
+    "destination": {
+      "name": "Canberra",
+      "center": [
+        -35.25,
+        149.14
+      ],
+      "zoom": 13,
+      "country": "Australia",
+      "timeZone": "Australia/Sydney"
+    },
+    "adapter": "gtfs-rt",
+    "region": "canberra-rail",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 15,
+    "maxAge": 300,
+    "coverage": "Canberra light rail; reported vehicles only",
+    "notes": "Canberra Metro / ACT Government. CC BY-SA 4.0 per the ACT open-data catalog. Positions filtered for freshness and bounds, with interpolated observation playback. The catalog specifies 15-second updates; actual vehicle timestamps determine freshness. This is light rail only, not Canberra buses. This public endpoint is deprecated by the provider but still returned fresh reports during verification; replacement MyWay+ access requires developer credentials.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
   }
 ]
