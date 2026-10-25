@@ -125,3 +125,14 @@ The map now distinguishes received reports from their buffered visualization. A 
 Metro rider-facing route names are joined from the officially linked [GTFS schedule](https://metro.kingcounty.gov/GTFS/google_transit.zip), capped at 30 MB compressed / 2 MB route-table size and cached for 24 hours. Failure falls back to explicitly labeled internal route IDs rather than guessed route numbers.
 
 Sound Transit rail route labels are joined independently from its [official static feed](https://www.soundtransit.org/GTFS-rail/40_gtfs.zip), avoiding collisions between agency route identifiers.
+
+
+## Viewport-driven exploration — 2026-10-25
+
+All connected layers are enabled initially. Provider coverage is selected from map bounds, not a manually chosen region. Regional feeds use their documented envelope and global duplicates are replaced in the UI by shared viewport layers. Existing fixed regional API routes remain available for compatibility.
+
+New `/api/world-{kind}?bbox=west,south,east,north` routes accept only eight fixed provider kinds and validated numeric bounds. Antimeridian views use west > east. Models sample nine points, not every location. Worldwide earthquake and buoy downloads are shared across viewport requests. NOAA radar tiles are restricted to the contiguous-US footprint; river and wildfire queries are also restricted to that region. Aircraft queries require a radius no greater than 250 nautical miles, matching [adsb.lol's API documentation](https://api.adsb.lol/docs). Open-Meteo current weather is [modeled data](https://open-meteo.com/en/docs), not a station measurement.
+
+Live checks: SF city feeds automatically loaded after coordinate search; London weather and Tokyo air-quality models returned nine samples each; a date-line earthquake view returned 18 events. Aircraft calls returned HTTP 429, so worldwide aircraft rendering could not be live-verified in this run. The existing decoder is reused with explicit global bounds; outage handling is tested and honors Retry-After across views. An independent Airplanes.live probe returned HTTP 403 and was not integrated.
+
+Regional-only sources retain their existing access restrictions, including WSDOT and AISStream credentials. Exploring a new city does not imply local transit / dispatch coverage there.

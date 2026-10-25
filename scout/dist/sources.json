@@ -66,7 +66,8 @@
     "defaultOn": true,
     "access": "integrated",
     "region": "bay",
-    "motion": true
+    "motion": true,
+    "supersededBy": "world-air"
   },
   {
     "id": "bikes",
@@ -168,7 +169,8 @@
     "notes": "Recent seismic events, not earthquake prediction.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-quake"
   },
   {
     "id": "alerts",
@@ -236,7 +238,8 @@
     "notes": "Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply.",
     "defaultOn": false,
     "access": "integrated",
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-rivers"
   },
   {
     "id": "airquality",
@@ -253,7 +256,8 @@
     "notes": "Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial.",
     "defaultOn": false,
     "access": "integrated",
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-airquality"
   },
   {
     "id": "wildfire",
@@ -270,7 +274,8 @@
     "notes": "Agency incident reports, not evacuation boundaries or guaranteed current perimeters.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-wildfire"
   },
   {
     "id": "511-transit",
@@ -425,7 +430,8 @@
     "maxAge": 900,
     "coverage": "NOAA CONUS mosaic viewed over the Bay Area",
     "defaultOn": false,
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-radar"
   },
   {
     "id": "buoys",
@@ -442,7 +448,8 @@
     "maxAge": 7200,
     "coverage": "Regional envelope: offshore and coastal stations",
     "defaultOn": false,
-    "region": "bay"
+    "region": "bay",
+    "supersededBy": "world-buoys"
   },
   {
     "id": "oakland",
@@ -490,7 +497,8 @@
     "defaultOn": true,
     "access": "integrated",
     "region": "seattle",
-    "motion": true
+    "motion": true,
+    "supersededBy": "world-air"
   },
   {
     "id": "sea-quake",
@@ -507,7 +515,8 @@
     "notes": "Recent seismic events, not earthquake prediction.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-quake"
   },
   {
     "id": "sea-weather",
@@ -558,7 +567,8 @@
     "notes": "Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply.",
     "defaultOn": false,
     "access": "integrated",
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-rivers"
   },
   {
     "id": "sea-wildfire",
@@ -575,7 +585,8 @@
     "notes": "Agency incident reports, not evacuation boundaries or guaranteed current perimeters.",
     "defaultOn": true,
     "access": "integrated",
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-wildfire"
   },
   {
     "id": "sea-buoys",
@@ -592,7 +603,8 @@
     "maxAge": 7200,
     "coverage": "Seattle / Puget Sound regional envelope",
     "defaultOn": false,
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-buoys"
   },
   {
     "id": "sea-radar",
@@ -609,7 +621,8 @@
     "maxAge": 900,
     "coverage": "Seattle / Puget Sound regional envelope",
     "defaultOn": false,
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-radar"
   },
   {
     "id": "sea-airquality",
@@ -626,7 +639,8 @@
     "notes": "Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial.",
     "defaultOn": false,
     "access": "integrated",
-    "region": "seattle"
+    "region": "seattle",
+    "supersededBy": "world-airquality"
   },
   {
     "id": "sea-fire",
@@ -957,5 +971,150 @@
     "icon": "◎",
     "color": "#399ebc",
     "coverage": "Seattle / Puget Sound; provider coverage varies"
+  },
+  {
+    "id": "world-air",
+    "name": "Aircraft",
+    "icon": "✈",
+    "color": "#9c78cd",
+    "group": "Motion",
+    "kind": "Live",
+    "source": "adsb.lol contributors",
+    "url": "https://api.adsb.lol/docs",
+    "refresh": 30,
+    "maxAge": 120,
+    "coverage": "Viewport queries; source reception and reporting coverage varies.",
+    "notes": "ADS-B/MLAT reception is incomplete. ODbL attribution applies.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "motion": true,
+    "viewport": true
+  },
+  {
+    "id": "world-quake",
+    "name": "Earthquakes",
+    "icon": "◎",
+    "color": "#ae9670",
+    "group": "Earth",
+    "kind": "Observed",
+    "source": "USGS Earthquake Hazards",
+    "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php",
+    "refresh": 300,
+    "maxAge": 0,
+    "coverage": "Viewport queries; source reception and reporting coverage varies.",
+    "notes": "Recent seismic events, not earthquake prediction.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-buoys",
+    "name": "Buoys & coastal conditions",
+    "group": "Water",
+    "access": "integrated",
+    "source": "NOAA NDBC",
+    "url": "https://www.ndbc.noaa.gov/",
+    "notes": "Latest NDBC wind, wave and water-temperature reports. Missing observations remain missing.",
+    "icon": "≈",
+    "color": "#4d9aa1",
+    "kind": "Observed",
+    "refresh": 600,
+    "maxAge": 7200,
+    "coverage": "Viewport queries; source reception and reporting coverage varies.",
+    "defaultOn": true,
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-airquality",
+    "name": "Air quality model",
+    "icon": "◌",
+    "color": "#9b9b66",
+    "group": "Earth",
+    "kind": "Modeled",
+    "source": "CAMS / Open-Meteo",
+    "url": "https://open-meteo.com/en/docs/air-quality-api",
+    "refresh": 3600,
+    "maxAge": 10800,
+    "coverage": "Nine modeled samples across the map view",
+    "notes": "Model estimates, not local sensors. CC BY 4.0; free endpoint noncommercial.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-radar",
+    "name": "Weather radar",
+    "group": "Earth",
+    "access": "integrated",
+    "source": "NOAA NEXRAD",
+    "url": "https://www.weather.gov/gis/cloudgiswebservices",
+    "notes": "Timestamped base reflectivity raster overlay. Echoes are not a forecast; blank tiles do not establish good weather.",
+    "icon": "◴",
+    "color": "#6e9d70",
+    "kind": "Radar",
+    "refresh": 300,
+    "maxAge": 900,
+    "coverage": "Contiguous United States; automatically selected by map view",
+    "defaultOn": true,
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-rivers",
+    "name": "River & water gauges",
+    "icon": "≋",
+    "color": "#5a9f93",
+    "group": "Water",
+    "kind": "Observed",
+    "source": "USGS Water Data",
+    "url": "https://api.waterdata.usgs.gov/docs/ogcapi/",
+    "refresh": 900,
+    "maxAge": 7200,
+    "coverage": "Contiguous United States; automatically selected by map view",
+    "notes": "Local gauge datum, not flood-depth estimates. Anonymous API rate limits apply.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-wildfire",
+    "name": "Wildfire incidents",
+    "icon": "♨",
+    "color": "#c47751",
+    "group": "Safety",
+    "kind": "Reports",
+    "source": "NIFC / WFIGS",
+    "url": "https://data-nifc.opendata.arcgis.com/",
+    "refresh": 900,
+    "maxAge": 86400,
+    "coverage": "Contiguous United States; automatically selected by map view",
+    "notes": "Agency incident reports, not evacuation boundaries or guaranteed current perimeters.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "viewport": true
+  },
+  {
+    "id": "world-weather",
+    "name": "Weather across this view",
+    "icon": "☁",
+    "color": "#6899ab",
+    "group": "Earth",
+    "kind": "Modeled",
+    "source": "Open-Meteo",
+    "url": "https://open-meteo.com/en/docs",
+    "refresh": 900,
+    "maxAge": 10800,
+    "coverage": "Nine modeled samples across the map view",
+    "notes": "Modeled current conditions, not station observations. CC BY 4.0 attribution; free API noncommercial.",
+    "defaultOn": true,
+    "access": "integrated",
+    "region": "world",
+    "viewport": true
   }
 ]

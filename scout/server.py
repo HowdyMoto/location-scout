@@ -5,16 +5,17 @@ import threading
 import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 from feeds import ADAPTERS
 from seattle import ADAPTERS as SEATTLE_ADAPTERS
 import ships
+import world
 ADAPTERS.update(SEATTLE_ADAPTERS)
 ADAPTERS.update({'sea-ships':lambda:ships.snapshot('seattle'),'bay-ships':lambda:ships.snapshot('bay')})
 
 ROOT = Path(__file__).resolve().parent
 CATALOG = json.loads((ROOT/'dist/sources.json').read_text(encoding='utf-8'))
-SOURCES = {s['id']:s for s in CATALOG if s['access']=='integrated'}
+SOURCES = {s['id']:s for s in CATALOG if s['access']=='integrated' and s.get('region')!='world'}
 CACHE = {}
 HISTORY = {}
 LOCKS = {key:threading.Lock() for key in SOURCES}
@@ -66,9 +67,15 @@ class Handler(SimpleHTTPRequestHandler):
         path=urlsplit(self.path).path
         if path.startswith('/api/'):
             key=path[len('/api/'):]
-            if key not in SOURCES:
-                return self.send_error(404,'Unknown source')
-            data=json.dumps(load_source(key),allow_nan=False).encode()
+            if key.startswith('world-'):
+                if key[6:] not in world.KINDS:return self.send_error(404,'Unknown source')
+                try:bounds=world.parse_bounds(parse_qs(urlsplit(self.path).query).get('bbox',[''])[0])
+                except ValueError:return self.send_error(400,'Invalid bounding box')
+                value=world.load(key[6:],bounds)
+            else:
+                if key not in SOURCES:return self.send_error(404,'Unknown source')
+                value=load_source(key)
+            data=json.dumps(value,allow_nan=False).encode()
             self.send_response(200)
             self.send_header('Content-Type','application/json; charset=utf-8')
             self.send_header('Cache-Control','no-store')
@@ -78,7 +85,7 @@ class Handler(SimpleHTTPRequestHandler):
             try:self.wfile.write(data)
             except (BrokenPipeError,ConnectionResetError):pass
             return
-        if path not in {'/','/index.html','/app.js','/motion.js','/live.js','/style.css','/sources.json'}:
+        if path not in {'/','/index.html','/app.js','/motion.js','/live.js','/explore.js','/style.css','/sources.json'}:
             return self.send_error(404)
         super().do_GET()
     def end_headers(self):

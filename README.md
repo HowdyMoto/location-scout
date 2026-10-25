@@ -1,12 +1,21 @@
 # Location Scout — Seattle + SF Bay Area
 
-Explore public geographic data on one map, defaulting to **Seattle / Puget Sound**, with a region selector for the **SF Bay Area**. Seattle has **19 public adapters plus configurable WSDOT ferry and AIS vessel adapters**; the Bay Area retains its **18 public adapters**, plus optional AIS vessels. No simulated events.
+Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, plus eight viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
 
-This is a researched starting inventory, not every regional API. Seattle's envelope is longitude −123.6…−121.2, latitude 46.8…48.8; the Bay Area envelope is −123.6…−121.2, 36.8…38.9. These include adjacent areas, not exact municipal boundaries. City dispatch feeds cover only their city.
+## Automatic geographic coverage
+
+- Moving or searching to SF immediately selects its city feeds; moving to Seattle selects its transit and dispatch feeds. A wide view can include both regions simultaneously.
+- **Worldwide:** aircraft reception where available, USGS earthquakes, NDBC buoy/coastal reports where stations exist, and nine weather / air-quality model samples across each view. These are not claims of complete global receiver, sensor or city-data coverage.
+- **Contiguous US:** NOAA radar, USGS water gauges and NIFC wildfire reports. Detailed gauge / fire queries ask for a closer zoom on very wide views. Aircraft queries are bounded to the provider's 250-nautical-mile maximum radius.
+- **Local coverage:** transit, dispatch, cameras, parking, outages/access candidates and other city feeds retain their actual provider coverage. New cities do not automatically gain local transit or dispatch integrations.
+- Viewport requests use validated bounding boxes, padded query areas, cancellation of obsolete browser requests, per-provider caches (24 areas each), shared global-feed caching and provider-wide rate-limit backoff. Late responses cannot overwrite a newer viewport. Longitude wrapping and date-line crossings are handled explicitly.
+- Layer preferences persist while exploring; **Everything** and **Reset** enable all available layers. Other presets remain optional. Search, geolocation and saved views use the same automatic coverage behavior.
+
+During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The aircraft provider returned HTTP 429 during this run; unavailable/stale state is shown and Retry-After is honored across viewports. No replacement positions are invented.
 
 ## Live motion experience
 
-Open **Live now** to watch individual vehicles instead of clustered snapshot dots. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
+The default **Everything** view includes moving vehicles and all other available layers. **Live now** narrows the view to motion and live safety feeds. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
 
 - Directional aircraft, transit and vessel markers persist across updates. No extrapolation: missing reports hold their last position; long gaps and implausible jumps are not animated. Expired reports disappear.
 - **Follow a flight / Follow transit**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
@@ -91,6 +100,8 @@ See [the source audit](docs/SOURCES.md) for provider links, access requirements 
 - `scout/server.py`: loopback-only Python HTTP server, fixed adapter routes, per-source cache and locks; no generic proxy.
 - `scout/feeds.py`: provider adapters and normalized records. Coordinates are validated and bounded; redacted locations are not reconstructed.
 - `scout/seattle.py`: Seattle-specific feeds and explicit regional configuration for shared adapters.
+- `scout/world.py`: fixed-provider viewport queries with validated bounding boxes, bounded caches and shared backoff.
+- `scout/dist/explore.js`: pure geographic coverage, longitude wrapping and query-area helpers.
 - `scout/ships.py`: optional server-side AIS receiver, never a browser WebSocket.
 - `scout/dist/motion.js`: pure observation interpolation and activity balancing, tested with Node.
 - `scout/dist/live.js`: persistent markers, following, pause controls and radar playback.
@@ -104,12 +115,12 @@ Python dependencies are `tzdata` for Pacific timestamps and `gtfs-realtime-bindi
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s scout/tests -v
-node --test scout/tests/motion.test.cjs
+node --test scout/tests/motion.test.cjs scout/tests/explore.test.cjs
 node --check scout/dist/app.js
 node --check scout/dist/live.js
 ```
 
-All 18 Bay Area sources and 19 public Seattle sources returned successful responses on 2026-10-24. The live-motion update passes 21 Python regression tests and nine JavaScript motion tests; browser checks covered region switching, source filtering and saved-view restoration. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
+All 18 Bay Area sources and 19 public Seattle sources returned successful responses on 2026-10-24. The live-motion update passes 29 Python regression tests and 15 JavaScript motion / coverage tests; browser checks covered region switching, source filtering and saved-view restoration. This is a point-in-time smoke test, not an uptime guarantee. Aircraft initially timed out and recovered on retry. Test counts and provider record counts will change.
 
 ## Data terms and limits
 
