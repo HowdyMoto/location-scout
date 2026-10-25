@@ -1390,5 +1390,113 @@
     "access": "integrated",
     "motion": true,
     "areaName": "Spain"
+  },
+  {
+    "id": "tokyo-bikes",
+    "name": "Tokyo bike availability",
+    "source": "Docomo Bike Share / ODPT",
+    "stationInformation": "https://api-public.odpt.org/api/v4/gbfs/docomo-cycle-tokyo/station_information.json",
+    "stationStatus": "https://api-public.odpt.org/api/v4/gbfs/docomo-cycle-tokyo/station_status.json",
+    "url": "https://docomo-cycle.jp/",
+    "bounds": [
+      138.8,
+      35.2,
+      140.4,
+      36.1
+    ],
+    "destination": {
+      "name": "Tokyo",
+      "center": [
+        35.68,
+        139.76
+      ],
+      "zoom": 13,
+      "country": "Japan",
+      "timeZone": "Asia/Tokyo"
+    },
+    "adapter": "gbfs",
+    "region": "tokyo-bikes",
+    "icon": "◉",
+    "color": "#438f93",
+    "group": "City",
+    "kind": "Live",
+    "refresh": 60,
+    "maxAge": 300,
+    "coverage": "Tokyo bike-sharing stations",
+    "notes": "CC BY 4.0. Station availability, not rider tracking. Counts update every minute; older reports are labeled stale. Changes may reflect rentals, returns or maintenance.",
+    "defaultOn": true,
+    "access": "integrated"
+  },
+  {
+    "id": "buenosaires-bikes",
+    "name": "Buenos Aires bike availability",
+    "source": "Ecobici Buenos Aires",
+    "stationInformation": "https://buenosaires.publicbikesystem.net/customer/gbfs/v3.0/station_information",
+    "stationStatus": "https://buenosaires.publicbikesystem.net/customer/gbfs/v3.0/station_status",
+    "url": "https://www.buenosaires.gob.ar/ecobici",
+    "bounds": [
+      -58.6,
+      -34.8,
+      -58.3,
+      -34.5
+    ],
+    "destination": {
+      "name": "Buenos Aires",
+      "center": [
+        -34.6037,
+        -58.3816
+      ],
+      "zoom": 13,
+      "country": "Argentina",
+      "timeZone": "America/Argentina/Buenos_Aires"
+    },
+    "adapter": "gbfs",
+    "region": "buenosaires-bikes",
+    "icon": "◉",
+    "color": "#438f93",
+    "group": "City",
+    "kind": "Live",
+    "refresh": 60,
+    "maxAge": 300,
+    "coverage": "Buenos Aires bike-sharing stations",
+    "notes": "Public GBFS feed. Station availability, not rider tracking. Counts update every minute; older reports are labeled stale. Changes may reflect rentals, returns or maintenance.",
+    "defaultOn": true,
+    "access": "integrated"
+  },
+  {
+    "id": "toronto-bikes",
+    "name": "Toronto bike availability",
+    "source": "Bike Share Toronto",
+    "stationInformation": "https://toronto.publicbikesystem.net/customer/gbfs/v3.0/station_information",
+    "stationStatus": "https://toronto.publicbikesystem.net/customer/gbfs/v3.0/station_status",
+    "url": "https://www.bikesharetoronto.com/",
+    "bounds": [
+      -79.8,
+      43.5,
+      -79,
+      44
+    ],
+    "destination": {
+      "name": "Toronto",
+      "center": [
+        43.6532,
+        -79.3832
+      ],
+      "zoom": 13,
+      "country": "Canada",
+      "timeZone": "America/Toronto"
+    },
+    "adapter": "gbfs",
+    "region": "toronto-bikes",
+    "icon": "◉",
+    "color": "#438f93",
+    "group": "City",
+    "kind": "Live",
+    "refresh": 60,
+    "maxAge": 300,
+    "coverage": "Toronto bike-sharing stations",
+    "notes": "Public GBFS feed. Station availability, not rider tracking. Counts update every minute; older reports are labeled stale. Changes may reflect rentals, returns or maintenance.",
+    "defaultOn": true,
+    "access": "integrated"
   }
 ]

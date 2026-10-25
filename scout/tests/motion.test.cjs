@@ -10,3 +10,10 @@ test('stationary observations do not count as movement',()=>{assert.equal(M.samp
 test('history sorts, deduplicates, prunes and rejects future timestamps',()=>{const result=M.merge([b,a],[a,{...a,time:t-700000},{...a,time:t+1000000}],t+30000);assert.deepEqual(result,[a,b])});
 test('activity is balanced across sources instead of dominated by aircraft',()=>{assert.deepEqual(M.balanced([['fire1','fire2'],['air1','air2','air3'],['bus1']],5),['fire1','air1','bus1','fire2','air2'])});
 test('empty history is safe',()=>{assert.equal(M.sample([],t),null)});
+test('availability changes require a newer station report and never count initial stations as changes',()=>{
+ const a={time:100,availability:{bikes:2,docks:8,renting:true,returning:true}};
+ assert.equal(M.availabilityChanged(undefined,a),false);
+ assert.equal(M.availabilityChanged(a,{...a,time:101}),false);
+ assert.equal(M.availabilityChanged(a,{time:101,availability:{...a.availability,bikes:1,docks:9}}),true);
+ assert.equal(M.availabilityChanged(a,{time:99,availability:{bikes:1}}),false);
+});

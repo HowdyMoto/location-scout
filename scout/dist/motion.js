@@ -27,6 +27,10 @@
    if(!added)break;
   }return out;
  }
- const api={distance,bearing,merge,sample,balanced};
+ function availabilityChanged(old,item){
+  if(!old?.availability||!item.availability||!Number.isFinite(old.time)||!Number.isFinite(item.time)||item.time<=old.time)return false;
+  return ['bikes','docks','renting','returning'].some(key=>old.availability[key]!==item.availability[key]);
+ }
+ const api={distance,bearing,merge,sample,balanced,availabilityChanged};
  if(typeof module!=='undefined')module.exports=api;else root.ScoutMotion=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

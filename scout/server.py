@@ -11,6 +11,7 @@ from seattle import ADAPTERS as SEATTLE_ADAPTERS
 import ships
 import world
 import transit
+import gbfs
 ADAPTERS.update(SEATTLE_ADAPTERS)
 ADAPTERS.update({'sea-ships':lambda:ships.snapshot('seattle'),'bay-ships':lambda:ships.snapshot('bay')})
 
@@ -18,6 +19,7 @@ ROOT = Path(__file__).resolve().parent
 CATALOG = json.loads((ROOT/'dist/sources.json').read_text(encoding='utf-8'))
 SOURCES = {s['id']:s for s in CATALOG if s['access']=='integrated' and s.get('region')!='world'}
 ADAPTERS.update({key:lambda source=source:transit.load(source) for key,source in SOURCES.items() if source.get('adapter')=='gtfs-rt'})
+ADAPTERS.update({key:lambda source=source:gbfs.load(source) for key,source in SOURCES.items() if source.get('adapter')=='gbfs'})
 CACHE = {}
 HISTORY = {}
 LOCKS = {key:threading.Lock() for key in SOURCES}

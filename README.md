@@ -15,6 +15,8 @@ During October 25 verification, moving the map to SF activated its sources witho
 
 Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux and Renfe commuter trains across Spain, plus Boston and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
 
+International bike availability is connected in Tokyo, Toronto and Buenos Aires. Zoom in for station bike counts; availability changes pulse on newer reports. These are changing inventories, not moving rider positions.
+
 ## Live motion experience
 
 The default **Everything** view includes moving vehicles and all other available layers. **Live now** narrows the view to motion and live safety feeds. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.

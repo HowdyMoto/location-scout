@@ -187,3 +187,16 @@ Radar recovery regression checks cover failed frames, delayed Leaflet cleanup, s
 Renfe Cercanías is connected through the official public `https://gtfsrt.renfe.com/vehicle_positions.pb` feed. Source and CC BY 4.0 attribution: https://data.renfe.com/dataset/ubicacion-vehiculos. The publisher specifies 20-second updates; Scout uses that refresh interval and the shared GTFS Realtime adapter. Madrid is an explorer shortcut, while panning anywhere within the Spanish selection envelope activates the feed. The envelope is only a discovery area: individual services and observations determine actual coverage.
 
 Live verification returned approximately 300 fresh trains, and 56 matching train identifiers changed coordinates between two snapshots. Missing per-vehicle timestamps and reports older than five minutes are excluded. A comparison probe of Renfe's separate high-speed/long-distance feed returned 243 entities without individual timestamps and a feed header roughly an hour old, so that feed is not connected. Finland's documented GTFS location endpoint returned HTTP 406, including with its documented protobuf media type, and remains unconnected.
+
+### International bike availability
+
+A reusable `gbfs` catalog adapter joins reviewed station-information and station-status endpoints, supporting GBFS 1/2 numeric timestamps and GBFS 3 ISO timestamps/localized names. Station coordinates are cached for one hour; availability refreshes every 60 seconds. Discovery URLs were obtained from MobilityData's public systems registry (https://github.com/MobilityData/gbfs/blob/master/systems.csv); runtime requests use only the fixed reviewed endpoint fields in the catalog. Specification: https://gbfs.org/documentation/reference/.
+
+Connected systems:
+- Tokyo: Docomo Bike Share / ODPT, https://api-public.odpt.org/api/v4/gbfs/docomo-cycle-tokyo/gbfs.json. The system-information feed declares CC BY 4.0. Approximately 1,930 timestamped stations verified; 9 changed availability between comparison snapshots.
+- Buenos Aires: Ecobici, https://buenosaires.publicbikesystem.net/customer/gbfs/v3.0/gbfs.json. Public operator GBFS feed; approximately 392 timestamped stations verified, 2 with changed availability between snapshots.
+- Toronto: Bike Share Toronto, https://toronto.publicbikesystem.net/customer/gbfs/v3.0/gbfs.json. Public operator GBFS feed; approximately 1,067 timestamped stations verified, 40 with changed availability between snapshots.
+
+Counts vary. Individual station reports older than five minutes are visibly stale; reports older than fifteen minutes, future reports and missing timestamps are omitted. Unknown counts are not represented as zero. Both rental and return availability are shown. Initial station loads do not pulse; changed availability on a newer report pulses and is labeled `AVAILABILITY CHANGED`. These are inventory changes, potentially including maintenance/rebalancing, not inferred trips or tracked riders. Street-level markers display available bikes; wider views cluster stations.
+
+Paris Vélib's public feed was investigated but all 1,519 reports were outside the freshness window during integration. It is not included as a connected live source. Its official open-data documentation is https://www.velib-metropole.fr/donnees-open-data-gbfs-du-service-velib-metropole.
