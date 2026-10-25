@@ -2,6 +2,8 @@
 
 Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus eight viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
 
+The map opens in **World view**. Green destination markers reveal connected cities and sky views; nearby destinations share a clickable menu. Select one to jump into its feeds, or pan and zoom anywhere. The World view button returns to the overview. These destinations indicate available integrations, not guaranteed current activity.
+
 ## Automatic geographic coverage
 
 - Moving or searching to SF immediately selects its city feeds; moving to Seattle selects its transit and dispatch feeds. A wide view can include both regions simultaneously.

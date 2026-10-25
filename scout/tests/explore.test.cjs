@@ -15,3 +15,14 @@ test('Norway regional footprints do not activate over Helsinki',()=>{
  assert.ok(!E.applies(source,[24.8,60.1,25.1,60.3]));
  assert.ok(E.applies(source,[10.2,63.3,10.6,63.5]));
 });
+test('world discovery groups nearby destinations without dropping any cities',()=>{
+ const places=[{id:'a',center:[10,10]},{id:'b',center:[15,15]},{id:'c',center:[300,300]}];
+ const groups=E.discoveryBuckets(places,p=>({x:p[0],y:p[1]}));
+ assert.deepEqual(groups.map(g=>g.map(p=>p.id)),[['a','b'],['c']]);
+ assert.deepEqual(E.discoveryBuckets([],p=>p),[]);
+});
+
+test('nearby discovery markers cluster across arbitrary grid boundaries',()=>{
+ const places=[{id:'west',center:[149,64]},{id:'east',center:[151,66]}];
+ assert.equal(E.discoveryBuckets(places,p=>({x:p[0],y:p[1]})).length,1);
+});

@@ -200,3 +200,9 @@ Connected systems:
 Counts vary. Individual station reports older than five minutes are visibly stale; reports older than fifteen minutes, future reports and missing timestamps are omitted. Unknown counts are not represented as zero. Both rental and return availability are shown. Initial station loads do not pulse; changed availability on a newer report pulses and is labeled `AVAILABILITY CHANGED`. These are inventory changes, potentially including maintenance/rebalancing, not inferred trips or tracked riders. Street-level markers display available bikes; wider views cluster stations.
 
 Paris Vélib's public feed was investigated but all 1,519 reports were outside the freshness window during integration. It is not included as a connected live source. Its official open-data documentation is https://www.velib-metropole.fr/donnees-open-data-gbfs-du-service-velib-metropole.
+
+### World-map discovery
+
+The default camera now opens on the world. At zoom levels 7 and below, the map draws catalog-driven destination markers alongside enabled data layers. Nearby destinations are grouped by screen proximity to reduce label overlap; clicking a group opens its destination menu. City and sky markers are shortcuts, not new observations or claims of active vehicles. They disappear when zooming into local data. The World view button restores the overview; local feeds remain selected from map bounds.
+
+Browser checks verified a grouped Madrid selection, the Renfe feed loading there, and direct selection of Tokyo with its bike layer. No manual region selector was required. Regression tests cover preserving every destination and grouping nearby labels across arbitrary grid boundaries.

@@ -68,8 +68,10 @@ function updateScenes(){
  const scenes=activeRegion==='seattle'?[
   ['City pulse',[47.607,-122.333],13],['Sea-Tac approaches',[47.45,-122.30],11],['Across the Sound',[47.66,-122.50],11]
  ]:activeRegion==='bay'?[['City pulse',[37.78,-122.42],13],['SFO approaches',[37.62,-122.38],11],['Across the Bay',[37.82,-122.25],10]]:[['Seattle',[47.61,-122.33],11],['San Francisco',[37.78,-122.42],12],...catalog.filter(s=>s.destination).map(s=>[s.destination.name,s.destination.center,s.destination.zoom])];
- $('scene-bar').innerHTML='<button id="explore-world">◎ Explore the world</button>'+scenes.slice(0,4).map((s,n)=>`<button data-scene="${n}">${s[0]}</button>`).join('');
+ $('scene-bar').innerHTML='<button id="world-view">◉ World view</button><button id="explore-world">◎ Explore the world</button>'+scenes.slice(0,4).map((s,n)=>`<button data-scene="${n}">${s[0]}</button>`).join('');
  $('explore-world').onclick=showExplorer;
+ $('world-view').onclick=()=>{showWorld();toast('Choose a destination on the map, or zoom anywhere for available feeds.')};
+ drawDiscovery();
  document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{stopFollowing();const s=scenes[+b.dataset.scene];map.flyTo(s[1],s[2],{duration:1});$('place').textContent=s[0]});
 }
 function drawRadar(l){
@@ -143,6 +145,28 @@ requestAnimationFrame(animationFrame);
 boot();
 
 let lastDestination=null;
+const discoveryLayer=L.layerGroup().addTo(map);
+map.on('moveend',drawDiscovery);
+function showWorld(){
+ stopFollowing();map.closePopup();map.fitBounds([[-55,-175],[72,180]],{animate:false});applyViewport();drawDiscovery();
+}
+function drawDiscovery(){
+ discoveryLayer.clearLayers();
+ if(map.getZoom()>7||!catalog.length)return;
+ const places=explorationPlaces().map(p=>({...p,center:p.center||homes[p.id]?.center})).filter(p=>p.center);
+ const buckets=ScoutExplore.discoveryBuckets(places,center=>map.project([center[0],displayLon(center[1])],map.getZoom()));
+ for(const bucket of buckets){
+  const first=bucket[0],point=first.center,label=bucket.length>1?`${bucket.length} places to explore`:first.name;
+  const icon=L.divIcon({className:'discovery-marker',html:`<span class="discovery-dot">${bucket.length>1?bucket.length:'↗'}</span><span class="discovery-name">${esc(label)}</span>`,iconSize:[150,32],iconAnchor:[16,16]});
+  const marker=L.marker([point[0],displayLon(point[1])],{icon,title:label,zIndexOffset:1000}).addTo(discoveryLayer);
+  marker.on('click',()=>{
+   if(bucket.length===1){visitDestination(first);return}
+   const list=document.createElement('div');list.className='discovery-options';
+   for(const p of bucket){const button=document.createElement('button');button.textContent=p.name+' ↗';button.title=p.description;button.onclick=()=>visitDestination(p);list.append(button)}
+   marker.bindPopup(list,{maxWidth:260}).openPopup();
+  });
+ }
+}
 function explorationPlaces(){
  return [{id:'seattle',name:'Seattle',country:'United States',timeZone:'America/Los_Angeles',description:'Buses, light rail, fire dispatch & coastal weather'},
  {id:'bay',name:'San Francisco',country:'United States',timeZone:'America/Los_Angeles',description:'Bike availability, traffic, tides & public reports'},
@@ -153,7 +177,7 @@ function explorationPlaces(){
 }
 function visitDestination(p){
  lastDestination=p.id;if(homes[p.id])setRegion(p.id);else{stopFollowing();map.setView(p.center,p.zoom);applyViewport()}$('region').value='explore';
- $('explore-dialog').close();toast('Exploring '+p.name+' · feeds follow your view.');
+ $('explore-dialog')?.close();map.closePopup();toast('Exploring '+p.name+' · feeds follow your view.');
 }
 function showExplorer(){
  let dialog=$('explore-dialog');
