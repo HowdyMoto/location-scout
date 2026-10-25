@@ -17,3 +17,22 @@ test('availability changes require a newer station report and never count initia
  assert.equal(M.availabilityChanged(a,{time:101,availability:{...a.availability,bikes:1,docks:9}}),true);
  assert.equal(M.availabilityChanged(a,{time:99,availability:{bikes:1}}),false);
 });
+test('eastbound date-line crossing stays near the Pacific instead of crossing Greenwich',()=>{
+ const points=[{lat:0,lon:179.99,time:t},{lat:0,lon:-179.99,time:t+30000}];
+ const p=M.sample(points,t+15000);assert.equal(p.state,'moving');assert.ok(Math.abs(Math.abs(p.lon)-180)<1e-9);assert.ok(Math.abs(p.heading-90)<1e-9);
+ assert.ok(M.sample(points,t+22500).lon<-179.99);
+});
+test('westbound date-line crossing takes the short path and retains speed rejection',()=>{
+ const points=[{lat:0,lon:-179.99,time:t},{lat:0,lon:179.99,time:t+30000}];
+ const p=M.sample(points,t+15000);assert.equal(p.state,'moving');assert.ok(Math.abs(Math.abs(p.lon)-180)<1e-9);assert.ok(Math.abs(p.heading-270)<1e-9);
+ assert.equal(M.sample(points,t+15000,10).state,'gap');
+});
+test('trails remain continuous across the date line in either displayed world copy',()=>{
+ const points=[{lat:1,lon:179.99},{lat:2,lon:-179.99},{lat:3,lon:-179.98}];
+ for(const center of [0,180,-180,540]){
+  const trail=M.trailCoordinates(points,center);
+  assert.ok(Math.abs(trail[0][1]-center)<=180);
+  for(let n=1;n<trail.length;n++)assert.ok(Math.abs(trail[n][1]-trail[n-1][1])<.1);
+ }
+ assert.deepEqual(M.trailCoordinates([],0),[]);
+});

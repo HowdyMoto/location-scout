@@ -33,7 +33,7 @@ function draw(l){
   if(moving(l)&&map.getZoom()>=10){drawVehicles(l);return}
   if(l.vehicles){l.vehicles.clear();l.motionTrails?.clear();l.vehicleMode=false}
   l.groupLayer.clearLayers();if(!l.on)return;
-  if(moving(l)&&l.trails&&map.getZoom()>=12){for(const trail of l.trails.values()){const recent=trail.filter(i=>Date.now()-i.time<180000);if(recent.length>1)L.polyline(recent.map(i=>[i.lat,i.lon]),{color:l.color,weight:2,opacity:.4,interactive:false}).addTo(l.groupLayer)}}
+  if(moving(l)&&l.trails&&map.getZoom()>=12){for(const trail of l.trails.values()){const recent=trail.filter(i=>Date.now()-i.time<180000);if(recent.length>1)L.polyline(ScoutMotion.trailCoordinates(recent,map.getCenter().lng),{color:l.color,weight:2,opacity:.4,interactive:false}).addTo(l.groupLayer)}}
   const buckets=new Map();
   for(const i of mapped(l).filter(inView)){
     const p=map.project([i.lat,displayLon(i.lon)],map.getZoom());

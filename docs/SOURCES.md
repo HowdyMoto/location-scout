@@ -226,3 +226,9 @@ Official marine API documentation: https://www.digitraffic.fi/en/marine-traffic/
 Source: Fintraffic / Digitraffic. License and attribution requirements: https://www.digitraffic.fi/en/terms-of-service/ and https://creativecommons.org/licenses/by/4.0/. The map credits the provider and license and labels the data as filtered/interpolated. Reception coverage is incomplete and is not worldwide AIS. Initial direct-stream verification received 304 fresh vessels within a short sample. `Follow ship` is available alongside flight and transit following.
 
 The integrated API comparison showed 350 fresh vessels and 245 matching vessels changing coordinates over 25 seconds. The browser rendered ship markers and verified Follow ship on a vessel reporting 6.3 knots with a moving playback state. Later snapshots exceeded 400 fresh reports as the stream accumulated coverage.
+
+### Global playback verification
+
+Date-line crossings now interpolate longitude along the short arc instead of traveling through Greenwich. Trails unwrap each adjacent point into the same displayed world, and vehicle following uses the closest longitude copy. Deterministic tests cover eastbound and westbound crossings, impossible-speed rejection and trail continuity around 0, ±180 and 540 degrees. These are fixture tests; they do not claim a live aircraft crossing was observed.
+
+Live API checks returned nine timestamped weather-model samples in views across Africa, Asia, Europe, North America, South America and Oceania. A browser search near Fiji at longitude 179.9 automatically loaded global layers without a region selection and showed model points on both sides of the date line without console errors. The sampled aircraft viewport was empty; no vehicle positions were fabricated.

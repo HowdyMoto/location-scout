@@ -46,7 +46,7 @@ function updateMotionTrails(l,target){
   if(p&&p.state!=='buffering')coordinates.push(p);
   const show=coordinates.length>1&&(vehicleType(l)==='air'||map.getZoom()>=12||followed?.id===id);
   if(show){
-   const latlngs=coordinates.map(x=>[x.lat,displayLon(x.lon)]);let line=l.motionTrails.get(id);
+   const latlngs=ScoutMotion.trailCoordinates(coordinates,map.getCenter().lng);let line=l.motionTrails.get(id);
    if(!line){line=L.polyline(latlngs,{renderer:trailRenderer,color:l.color,weight:followed?.id===id?3:1.5,opacity:.5,interactive:false}).addTo(l.groupLayer);l.motionTrails.set(id,line)}else line.setLatLngs(latlngs);
   }else if(l.motionTrails.has(id)){l.groupLayer.removeLayer(l.motionTrails.get(id));l.motionTrails.delete(id)}
  }
@@ -124,7 +124,7 @@ function animationFrame(now){
    const el=marker.getElement();
    if(el){const h=Number.isFinite(p.heading)?p.heading:0;el.querySelector('.vehicle-direction').style.transform=`rotate(${h}deg)`;el.classList.toggle('vehicle-held',p.state==='gap'||staleItem(l,marker.record));el.classList.toggle('vehicle-followed',followed?.layer===l.id&&followed.id===id)}
    if(map.getBounds().contains([p.lat,displayLon(p.lon)])){if(p.state==='moving')inMotion++;else if(p.state==='buffering')buffering++;else holding++}
-   if(followed?.layer===l.id&&followed.id===id&&now-lastFollow>250){lastFollow=now;$('follow-name').textContent=marker.record.title;map.panTo([p.lat,p.lon],{animate:false,noMoveStart:true})}
+   if(followed?.layer===l.id&&followed.id===id&&now-lastFollow>250){lastFollow=now;$('follow-name').textContent=marker.record.title;map.panTo([p.lat,displayLon(p.lon)],{animate:false,noMoveStart:true})}
   }
   if(now-lastMetrics>1000)updateMotionTrails(l,target);
  }
