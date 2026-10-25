@@ -6,6 +6,7 @@ import urllib.error
 from email.utils import parsedate_to_datetime
 from collections import OrderedDict
 import feeds as f
+import radar
 
 GLOBE=(-180,-90,180,90)
 US=(-125,24,-66,50)
@@ -70,8 +71,7 @@ def fetch_view(kind,b):
         value=shared(kind,lambda:f.quakes(GLOBE) if kind=='quake' else f.buoys(GLOBE))
         return {**value,'items':[i for i in value['items'] if contains(b,i['lat'],i['lon'])]}
     if kind=='radar':
-        if not intersects(b,US):return f.result([],'NOAA radar covers the contiguous United States.',coverageUnavailable=True)
-        return shared(kind,f.radar)
+        return shared(kind,radar.load)
     if kind=='air':
         lat,lon=center(b)
         radius=query_radius(b)

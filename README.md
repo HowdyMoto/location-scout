@@ -1,17 +1,19 @@
-# Location Scout — Seattle + SF Bay Area
+# Location Scout — Explore the live world
 
-Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, plus eight viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
+Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus eight viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
 
 ## Automatic geographic coverage
 
 - Moving or searching to SF immediately selects its city feeds; moving to Seattle selects its transit and dispatch feeds. A wide view can include both regions simultaneously.
-- **Worldwide:** aircraft reception where available, USGS earthquakes, NDBC buoy/coastal reports where stations exist, and nine weather / air-quality model samples across each view. These are not claims of complete global receiver, sensor or city-data coverage.
-- **Contiguous US:** NOAA radar, USGS water gauges and NIFC wildfire reports. Detailed gauge / fire queries ask for a closer zoom on very wide views. Aircraft queries are bounded to the provider's 250-nautical-mile maximum radius.
+- **Worldwide:** aircraft reception where available, USGS earthquakes, NDBC buoy/coastal reports where stations exist, RainViewer radar mosaics where contributing networks provide coverage, and nine weather / air-quality model samples across each view. These are not claims of complete global receiver, sensor or city-data coverage.
+- **Contiguous US:** USGS water gauges and NIFC wildfire reports. Detailed gauge / fire queries ask for a closer zoom on very wide views. Aircraft queries are bounded to the provider's 250-nautical-mile maximum radius.
 - **Local coverage:** transit, dispatch, cameras, parking, outages/access candidates and other city feeds retain their actual provider coverage. New cities do not automatically gain local transit or dispatch integrations.
 - Viewport requests use validated bounding boxes, padded query areas, cancellation of obsolete browser requests, per-provider caches (24 areas each), shared global-feed caching and provider-wide rate-limit backoff. Late responses cannot overwrite a newer viewport. Longitude wrapping and date-line crossings are handled explicitly.
 - Layer preferences persist while exploring; **Everything** and **Reset** enable all available layers. Other presets remain optional. Search, geolocation and saved views use the same automatic coverage behavior.
 
-During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The aircraft provider returned HTTP 429 during this run; unavailable/stale state is shown and Retry-After is honored across viewports. No replacement positions are invented.
+During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The worldwide aircraft layer now uses adsb.fi, verified around London, Singapore and Cape Town. Its public API is personal/noncommercial; public commercial deployment requires suitable access. No replacement positions are invented.
+
+Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro and Bordeaux, plus Boston and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
 
 ## Live motion experience
 
@@ -21,7 +23,7 @@ The default **Everything** view includes moving vehicles and all other available
 - **Follow a flight / Follow transit**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
 - **Pause** freezes displayed vehicle positions while data continues arriving. Resume returns to buffered playback. Reduced-motion preferences start playback paused.
 - Fading trails connect observed points, not road or rail geometry. Tracks are individually visible at zoom 10+, with clusters when zoomed further out.
-- **Radar loop** cycles the latest 12 frames advertised by NOAA, showing each observation time. New tiles load before replacing the previous frame; failed loads retain the old frame with an explicit error.
+- **Radar loop** cycles up to 13 recent RainViewer mosaics worldwide. Times identify mosaic generation, not the age of every contributing radar. Native resolution is capped at zoom 7; blank areas can indicate missing coverage. New tiles load before replacing the previous frame; failed or timed-out frames retain the last successful frame and playback retries after five seconds. Public provider access is intended for personal/educational use.
 - The activity sidebar rotates across enabled sources, so aircraft do not hide dispatches and transit. Newly received safety reports pulse briefly and retain their original report timestamps. Initial history does not trigger arrival pulses.
 - Metro and Sound Transit route names come from `routes.txt` in the official GTFS download, cached for a day. If metadata is unavailable, the app explicitly shows the provider's internal route ID.
 

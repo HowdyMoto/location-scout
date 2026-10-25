@@ -82,17 +82,33 @@ function advanceRadar(l){
  if(!frames[0]||l.radarPending)return;
  const next=(l.radarIndex??-1)+1,index=next%frames.length,time=frames[index];
  l.radarPending=true;
- const tile=L.tileLayer.wms(l.raster.url,{layers:l.raster.layer,format:'image/png',transparent:true,opacity:0,time,bounds:L.latLngBounds([24,-125],[50,-66]),attribution:'Radar © NOAA / NWS'});
- let failed=false;
- tile.on('tileerror',()=>{failed=true;$('radar-time').textContent='Radar tiles unavailable · last frame held'});
- tile.once('load',()=>{
+ const tile=l.raster.type==='xyz'
+  ?L.tileLayer(l.raster.frameUrls[index],{opacity:0,maxNativeZoom:7,maxZoom:19,attribution:'Weather data by <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a>'})
+  :L.tileLayer.wms(l.raster.url,{layers:l.raster.layer,format:'image/png',transparent:true,opacity:0,time,bounds:L.latLngBounds([24,-125],[50,-66]),attribution:'Radar © NOAA / NWS'});
+ let failed=false,settled=false;
+ const finish=()=>{
+  if(settled)return;settled=true;clearTimeout(timeout);
   l.radarPending=false;
-  if(failed||!l.on||!layers.includes(l)){l.groupLayer.removeLayer(tile);radarNextAt=Date.now()+5000;return}
-  if(l.radarCurrent)l.groupLayer.removeLayer(l.radarCurrent);
-  l.radarCurrent=tile;l.radarIndex=index;tile.setOpacity(.5);
-  $('radar-time').textContent=`RADAR ${new Date(time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${index+1}/${frames.length} observed frames`;
+  // Advance even on failure: an expired frame must not trap playback forever.
+  l.radarIndex=index;
+  if(failed||!l.on||!layers.includes(l)){
+   tile.off('tileerror');l.groupLayer.removeLayer(tile);radarNextAt=Date.now()+5000;
+   if(failed&&l.on&&layers.includes(l))$('radar-time').textContent=l.radarCurrent?'Radar frame unavailable · last frame held · retrying':'Radar tiles unavailable · retrying';
+   return;
+  }
+  if(l.radarCurrent){l.radarCurrent.off('tileerror');l.groupLayer.removeLayer(l.radarCurrent)}
+  l.radarCurrent=tile;tile.setOpacity(.5);
+  $('radar-time').textContent=`RADAR ${new Date(time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${index+1}/${frames.length} ${l.raster.type==='xyz'?'mosaics · coverage varies':'observed frames'}`;
   radarNextAt=Date.now()+1400;
+ };
+ const timeout=setTimeout(()=>{failed=true;finish()},20000);
+ tile.on('tileerror',()=>{
+  failed=true;
+  if(l.on&&layers.includes(l)&&l.radarCurrent===tile)$('radar-time').textContent='Radar coverage incomplete · retrying';
  });
+ // Leaflet still accesses the layer's map after emitting load. Never remove
+ // this layer synchronously from that callback (including failed tiles).
+ tile.once('load',()=>setTimeout(finish,0));
  l.groupLayer.addLayer(tile);
 }
 function animationFrame(now){

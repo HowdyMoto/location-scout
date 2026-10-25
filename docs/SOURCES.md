@@ -171,3 +171,13 @@ The public service is for personal, noncommercial use only. This local prototype
 Aircraft feed clocks must be recent, and each aircraft needs a finite nonnegative position age no greater than 120 seconds. No feed time is fabricated when missing. The existing observation playback uses received positions and holds on gaps. Source attribution and noncommercial limits appear in source notes and record summaries.
 
 Live API checks returned aircraft around London, Singapore and Cape Town (135, 7 and 5 respectively during verification). Counts vary and do not establish complete coverage. Added sky destinations for those areas to the world explorer. Remaining work includes wider local source coverage, worldwide weather animation, and production-grade access for a public commercial deployment.
+
+### Worldwide animated radar
+
+The visible `world-radar` layer now uses RainViewer's past radar mosaics worldwide, replacing its previous contiguous-US-only selection. The legacy NOAA regional adapters remain available for compatibility. Official documentation: https://www.rainviewer.com/api/weather-maps-api.html and https://www.rainviewer.com/api.html.
+
+The backend shares one five-minute cached manifest across all views. It accepts only the documented HTTPS tile host and radar paths, sorts and bounds the last 13 past frames, excludes nowcast data, and rejects stale manifests. The browser loads actual XYZ radar tiles, caps native zoom at 7 (enlarging tiles at closer zooms), credits RainViewer visibly, and swaps frames only after loading. Pause/play remains available.
+
+Frame times are mosaic generation timestamps, not synchronized timestamps for every contributing radar. Blank regions can mean no coverage rather than no precipitation. The playback label says coverage varies; source notes explain the distinction. The public service is intended for personal/educational use; commercial deployment needs suitable provider terms. During verification, the live manifest supplied 13 frames and a European PNG tile returned successfully; browser playback advanced outside the US without console errors.
+
+Radar recovery regression checks cover failed frames, delayed Leaflet cleanup, stalled tile timeouts, late completion and disabling playback during a load. A failed frame advances to the next candidate after a five-second backoff; the last successful frame remains visible.
