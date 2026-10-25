@@ -15,7 +15,7 @@ The map opens in **World view**. Green destination markers reveal connected citi
 
 During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The worldwide aircraft layer now uses adsb.fi, verified around London, Singapore and Cape Town. Its public API is personal/noncommercial; public commercial deployment requires suitable access. No replacement positions are invented.
 
-Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux and Renfe commuter trains across Spain, plus Boston and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
+Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux and Renfe commuter trains across Spain, plus Boston, Los Angeles and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
 
 International bike availability is connected in Tokyo, Toronto and Buenos Aires. Zoom in for station bike counts; availability changes pulse on newer reports. These are changing inventories, not moving rider positions.
 
@@ -30,6 +30,10 @@ The default **Everything** view includes moving vehicles and all other available
 - **Radar loop** cycles up to 13 recent RainViewer mosaics worldwide. Times identify mosaic generation, not the age of every contributing radar. Native resolution is capped at zoom 7; blank areas can indicate missing coverage. New tiles load before replacing the previous frame; failed or timed-out frames retain the last successful frame and playback retries after five seconds. Public provider access is intended for personal/educational use.
 - The activity sidebar rotates across enabled sources, so aircraft do not hide dispatches and transit. Newly received safety reports pulse briefly and retain their original report timestamps. Initial history does not trigger arrival pulses.
 - Metro and Sound Transit route names come from `routes.txt` in the official GTFS download, cached for a day. If metadata is unavailable, the app explicitly shows the provider's internal route ID.
+
+### Streamed Los Angeles vehicles
+
+LA Metro bus and rail positions use the agency’s public WebSocket service. Each agency has one server-side connection shared across viewers. The browser refreshes its snapshot every five seconds; actual GPS observation timestamps determine freshness and motion. Connections stop after two minutes without snapshot requests and reconnect with backoff after interruption. The existing 90-second observation playback remains in effect.
 
 ### Optional vessel feeds
 

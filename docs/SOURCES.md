@@ -206,3 +206,13 @@ Paris Vélib's public feed was investigated but all 1,519 reports were outside t
 The default camera now opens on the world. At zoom levels 7 and below, the map draws catalog-driven destination markers alongside enabled data layers. Nearby destinations are grouped by screen proximity to reduce label overlap; clicking a group opens its destination menu. City and sky markers are shortcuts, not new observations or claims of active vehicles. They disappear when zooming into local data. The World view button restores the overview; local feeds remain selected from map bounds.
 
 Browser checks verified a grouped Madrid selection, the Renfe feed loading there, and direct selection of Tokyo with its bike layer. No manual region selector was required. Regression tests cover preserving every destination and grouping nearby labels across arbitrary grid boundaries.
+
+### Shared LA Metro vehicle streams
+
+Official API: https://api.metro.net/. WebSocket documentation: https://lacmta.github.io/metro-api-v2/docs/websockets/. Fixed endpoints are `wss://api.metro.net/ws/LACMTA/vehicle_positions` (buses) and `wss://api.metro.net/ws/LACMTA_Rail/vehicle_positions` (rail). The public documentation describes stream updates every three seconds, but Scout does not equate message delivery with new GPS observations.
+
+`scout/metro.py` maintains one demand-driven connection per agency, shared across local viewers. Snapshot requests renew a two-minute lease; idle connections close. Reconnects use bounded exponential backoff with jitter. Messages have a 2 MB cap, each agency retains at most 5,000 vehicles, and observations older than five minutes are omitted. Only valid per-vehicle observation timestamps and coordinates in the configured LA envelope are accepted; out-of-order reports cannot replace newer positions. No timestamp is fabricated from receipt time. The browser refreshes shared snapshots every five seconds and uses the existing bounded observation history for playback. Route codes come from the agency's `route_code` field.
+
+Live checks received approximately 1,135 fresh bus positions and 119 fresh rail positions, with both streams connected. Counts vary by service. Unit checks cover timestamp validation, geographic limits, out-of-order messages, shared connections and idle demand expiry. Strætó Iceland's official documentation was also reviewed, but real-time access requires an application, so it was not connected.
+
+A 20-second comparison through Scout's API found 859 buses and 64 rail vehicles with newer timestamps and changed coordinates. After the playback buffer filled, the browser displayed 606 moving vehicles in the LA view; following a Metro Route 460 bus confirmed its detail state was moving between timestamped observations.

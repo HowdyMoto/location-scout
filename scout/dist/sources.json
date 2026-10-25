@@ -1498,5 +1498,69 @@
     "notes": "Public GBFS feed. Station availability, not rider tracking. Counts update every minute; older reports are labeled stale. Changes may reflect rentals, returns or maintenance.",
     "defaultOn": true,
     "access": "integrated"
+  },
+  {
+    "id": "la-buses",
+    "name": "LA Metro buses",
+    "source": "Los Angeles County Metropolitan Transportation Authority",
+    "adapter": "metro-stream",
+    "agency": "LACMTA",
+    "url": "https://lacmta.github.io/metro-api-v2/docs/websockets/",
+    "region": "la-buses",
+    "bounds": [
+      -119.2,
+      33.3,
+      -117,
+      34.9
+    ],
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 5,
+    "maxAge": 300,
+    "coverage": "LA Metro reported vehicles in Los Angeles County",
+    "notes": "Official public WebSocket vehicle feed, shared by local viewers. Only fresh per-vehicle timestamps are used. Stream delivery frequency does not guarantee fresh GPS observations on every message.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true,
+    "areaName": "Los Angeles",
+    "destination": {
+      "name": "Los Angeles",
+      "center": [
+        34.05,
+        -118.25
+      ],
+      "zoom": 12,
+      "country": "United States",
+      "timeZone": "America/Los_Angeles"
+    }
+  },
+  {
+    "id": "la-rail",
+    "name": "LA Metro rail",
+    "source": "Los Angeles County Metropolitan Transportation Authority",
+    "adapter": "metro-stream",
+    "agency": "LACMTA_Rail",
+    "url": "https://lacmta.github.io/metro-api-v2/docs/websockets/",
+    "region": "la-rail",
+    "bounds": [
+      -119.2,
+      33.3,
+      -117,
+      34.9
+    ],
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 5,
+    "maxAge": 300,
+    "coverage": "LA Metro reported vehicles in Los Angeles County",
+    "notes": "Official public WebSocket vehicle feed, shared by local viewers. Only fresh per-vehicle timestamps are used. Stream delivery frequency does not guarantee fresh GPS observations on every message.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true,
+    "areaName": "Los Angeles"
   }
 ]
