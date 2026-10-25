@@ -1,6 +1,7 @@
 /* Timestamped observation playback. Never extrapolates beyond received reports. */
 (function(root){
  'use strict';
+ const maxSpeed=layer=>layer.id==='iss-orbit'?9000:(layer.id||'').includes('air')?400:65;
  const radians=d=>d*Math.PI/180;
  const wrapLongitude=lon=>((lon+180)%360+360)%360-180;
  function trailCoordinates(points,centerLongitude){
@@ -48,7 +49,7 @@
    for(const i of l.items||[]){
     if(!Number.isFinite(i.time)||now-i.time>Math.min(l.maxAge||300,300)*1000||i.time>now+60000||!Number.isFinite(i.lat)||!Number.isFinite(i.lon))continue;
     if(distance({lat:center[0],lon:center[1]},i)>50000)continue;
-    if(l.motion){result.vehicles++;if(sample(l.trails?.get(i.id)||[i],now-90000,l.id==='world-air'?400:65)?.state==='moving')result.moving++}
+    if(l.motion){result.vehicles++;if(sample(l.trails?.get(i.id)||[i],now-90000,maxSpeed(l))?.state==='moving')result.moving++}
     else if(i.availability||l.id==='bikes')result.stations++;
    }
   }
@@ -59,6 +60,6 @@
   for(const field of ['moving','vehicles','stations']){const active=candidates.filter(p=>p.activity?.[field]>0);if(active.length)return active}
   return candidates;
  }
- const api={distance,bearing,merge,sample,balanced,availabilityChanged,wrapLongitude,trailCoordinates,activity,activeDestinations};
+ const api={maxSpeed,distance,bearing,merge,sample,balanced,availabilityChanged,wrapLongitude,trailCoordinates,activity,activeDestinations};
  if(typeof module!=='undefined')module.exports=api;else root.ScoutMotion=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

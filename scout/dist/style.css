@@ -15,3 +15,5 @@
 .discovery-marker{display:flex!important;align-items:center;gap:6px;white-space:nowrap}.discovery-dot{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:50%;background:#235c49;color:#fff;border:2px solid #eaf4d8;box-shadow:0 2px 12px #173c4055;font-size:13px;font-weight:700}.discovery-name{background:#fffffff2;border:1px solid #c4d7c4;border-radius:5px;padding:5px 7px;color:#264b40;font:600 10px 'DM Sans',sans-serif;box-shadow:0 2px 8px #173c4020}.discovery-options{display:grid;gap:6px;min-width:160px}.discovery-options button{text-align:left;background:#edf5e7;border-radius:5px;padding:10px;color:#264b40}.discovery-options button:hover{background:#d9ebcc}#world-view{background:#edf5e7;color:#245d49}
 
 .explore-place .explore-activity{font-size:11px;padding:7px 9px;border-radius:6px;background:#f1f3ee;color:#718174;line-height:1.5}.explore-place .explore-activity.has-activity{background:#e5f2df;color:#2b6247}
+
+.vehicle-shell.satellite{width:32px;height:32px;border-color:#f5e4b5;background:#9b692b}.satellite .vehicle-label{color:#78501f}

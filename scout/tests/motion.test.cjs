@@ -69,3 +69,11 @@ test('unqueried aircraft, coverage gaps and missing access never imply a quiet d
  for(const flag of ['zoomRequired','coverageUnavailable','configurationRequired'])assert.equal(M.activity([{...layer,[flag]:true}],[0,0],t).checked,false);
  assert.equal(M.activity([{id:'bikes',status:'ok',fetchedAt:t,items:[a]}],[a.lat,a.lon],t).stations,1);
 });
+
+test('orbital playback accepts satellite speeds without weakening aircraft or ground limits',()=>{
+ const points=[{lat:0,lon:0,time:t},{lat:0,lon:1,time:t+15000}];
+ assert.equal(M.sample(points,t+7500,M.maxSpeed({id:'iss-orbit'})).state,'moving');
+ assert.equal(M.sample(points,t+7500,M.maxSpeed({id:'world-air'})).state,'gap');
+ assert.equal(M.sample(points,t+7500,M.maxSpeed({id:'bus'})).state,'gap');
+ assert.equal(M.sample(points,t+30000,M.maxSpeed({id:'iss-orbit'})).state,'holding');
+});

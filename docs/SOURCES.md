@@ -269,3 +269,14 @@ Canberra is now an exploration destination and its feed activates from map bound
 Official source documentation: https://translink.com.au/about-translink/open-data . The public SEQ feed https://gtfsrt.api.translink.com.au/api/realtime/SEQ/VehiclePositions returned 151 fresh positions. It is not activated in Scout yet: https://translink.com.au/about-translink/open-data/terms-and-conditions requires current developer contact details, and the source documentation says realtime feeds must be used with GTFS schedules. Follow-up should complete the developer-contact requirement and route metadata integration before activation. No contact details were submitted or messages sent.
 
 Canberra verification: both fresh vehicles (LRV15 and LRV17) changed coordinates between integrated snapshots. The browser activated the layer from a coordinate search, showed two moving vehicles after the playback buffer filled, and followed LRV15. Provider/license attribution was visible; no console errors were reported.
+
+
+### International Space Station orbital model
+
+Provider and documentation: https://wheretheiss.at/w/developer . Fixed current-position endpoint: https://api.wheretheiss.at/v1/satellites/25544 . The provider permits unauthenticated access with roughly one request per second; Scout shares a ten-second cache across viewers. Attribution links to Where the ISS at? / Bill Shupp. This is a calculated orbital position, not onboard GPS reception or a claim of live spacecraft telemetry.
+
+Only ISS ID 25544, kilometer units, finite coordinates, and provider timestamps within the past 120 seconds (up to 60 seconds future tolerance) are accepted. Missing altitude or speed is omitted rather than invented. The model layer is enabled worldwide; its gold satellite marker remains individually visible at world zoom. Follow ISS uses continental zoom, unlike street-level transit following. Playback still uses only received timestamps with a 90-second delay. Its 9,000 m/s ground-track sanity limit is isolated from aircraft (400 m/s) and ground/water (65 m/s) limits. Date-line wrapping and long-gap rejection remain in force.
+
+Tests cover stale/future/missing timestamps, wrong satellite/units, invalid coordinates, optional metadata, satellite-speed interpolation, unchanged aircraft/ground rejection and holding after the last received sample.
+
+Live verification returned an ISS estimate less than a second from the request time. Integrated samples changed from approximately 49.86° S, 60.70° W to 50.93° S, 54.14° W over 70 provider seconds, with six history samples accumulated. Browser Follow ISS centered the South Atlantic at continental zoom, rendered the model-labeled marker, and showed moving playback after the buffer filled, with no console errors. The radar independently reported an unavailable frame and retained its previous frame during this view.

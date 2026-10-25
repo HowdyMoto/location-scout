@@ -1669,5 +1669,29 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true
+  },
+  {
+    "id": "iss-orbit",
+    "name": "ISS orbital position",
+    "source": "Where the ISS at? / Bill Shupp",
+    "url": "https://wheretheiss.at/w/developer",
+    "bounds": [
+      -180,
+      -85,
+      180,
+      85
+    ],
+    "region": "orbit",
+    "icon": "✧",
+    "color": "#d09538",
+    "group": "Motion",
+    "kind": "Modeled",
+    "refresh": 10,
+    "maxAge": 120,
+    "coverage": "Worldwide ground projection of the ISS orbit",
+    "notes": "Current orbital model estimates, not on-board GPS telemetry. Shared ten-second fetch; provider timestamps and a 90-second playback buffer. Use Follow ISS to find its current ground track.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
   }
 ]

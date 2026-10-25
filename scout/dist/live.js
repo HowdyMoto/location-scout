@@ -8,13 +8,13 @@ function playbackTime(){return (pausedAt??Date.now())-BUFFER_MS}
 function positionFor(l,i,target=playbackTime()){
  const key=l.id+':'+i.id;
  if(pausedAt&&pausedSamples.has(key))return pausedSamples.get(key);
- const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],target,vehicleType(l)==='air'?400:65);
+ const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],target,ScoutMotion.maxSpeed(l));
  if(pausedAt&&p)pausedSamples.set(key,p);
  return p;
 }
-function vehicleType(l){return l.id==='air'||l.id==='sea-air'||l.id==='world-air'?'air':l.id.includes('ferr')||l.id.includes('ships')?'ship':'transit'}
+function vehicleType(l){return l.id==='iss-orbit'?'satellite':l.id==='air'||l.id==='sea-air'||l.id==='world-air'?'air':l.id.includes('ferr')||l.id.includes('ships')?'ship':'transit'}
 function vehicleSvg(type){
- const paths={air:'M12 1 14 9 22 15 22 18 14 15 14 20 17 22 17 24 12 22 7 24 7 22 10 20 10 15 2 18 2 15 10 9Z',ship:'M12 1 20 9 18 23 6 23 4 9Z',transit:'M12 1 19 8 19 22 5 22 5 8Z'};
+ const paths={satellite:'M9 8h6v10H9zM1 3h6v8H1zM17 15h6v8h-6zM6 9l4 3M14 15l4 3',air:'M12 1 14 9 22 15 22 18 14 15 14 20 17 22 17 24 12 22 7 24 7 22 10 20 10 15 2 18 2 15 10 9Z',ship:'M12 1 20 9 18 23 6 23 4 9Z',transit:'M12 1 19 8 19 22 5 22 5 8Z'};
  return `<svg viewBox="0 0 24 26" aria-hidden="true"><path d="${paths[type]}"/><path class="vehicle-window" d="M9 11h6v4H9z"/></svg>`;
 }
 function drawVehicles(l){
@@ -31,7 +31,7 @@ function drawVehicles(l){
    marker.bindTooltip(esc(i.title),{direction:'top',offset:[0,-15],className:'vehicle-tooltip'});l.vehicles.set(i.id,marker);
   }
   marker.record=i;marker.playback=p;marker.setTooltipContent(esc(i.title));marker.options.title=i.title;
-  const el=marker.getElement();if(el){el.setAttribute('title',i.title);el.querySelector('.vehicle-label').textContent=vehicleType(l)==='air'?i.title:(i.routeLabel||'');el.classList.toggle('show-label',map.getZoom()>=13||followed?.id===i.id)}
+  const el=marker.getElement();if(el){el.setAttribute('title',i.title);el.querySelector('.vehicle-label').textContent=vehicleType(l)==='satellite'?'ISS · modeled':vehicleType(l)==='air'?i.title:(i.routeLabel||'');el.classList.toggle('show-label',vehicleType(l)==='satellite'||map.getZoom()>=13||followed?.id===i.id)}
  }
  for(const [id,marker] of l.vehicles)if(!keep.has(id)){l.groupLayer.removeLayer(marker);l.vehicles.delete(id);if(l.motionTrails.has(id)){l.groupLayer.removeLayer(l.motionTrails.get(id));l.motionTrails.delete(id)}}
  if(followed?.layer===l.id&&!l.vehicles.has(followed.id)){stopFollowing();toast('Tracking ended: no recent position is available.')}
@@ -42,9 +42,9 @@ function updateMotionTrails(l,target){
   const p=marker.playback,points=(l.trails?.get(id)||[]).filter(x=>x.time<=target&&x.time>target-180000);
   const coordinates=[];
   // Break at long gaps or impossible jumps instead of drawing a misleading track.
-  for(const x of points){const prev=coordinates.at(-1);if(prev&&(x.time-prev.time>120000||ScoutMotion.distance(prev,x)/((x.time-prev.time)/1000)>(vehicleType(l)==='air'?400:65)))coordinates.length=0;coordinates.push(x)}
+  for(const x of points){const prev=coordinates.at(-1);if(prev&&(x.time-prev.time>120000||ScoutMotion.distance(prev,x)/((x.time-prev.time)/1000)>(ScoutMotion.maxSpeed(l))))coordinates.length=0;coordinates.push(x)}
   if(p&&p.state!=='buffering')coordinates.push(p);
-  const show=coordinates.length>1&&(vehicleType(l)==='air'||map.getZoom()>=12||followed?.id===id);
+  const show=coordinates.length>1&&(['air','satellite'].includes(vehicleType(l))||map.getZoom()>=12||followed?.id===id);
   if(show){
    const latlngs=ScoutMotion.trailCoordinates(coordinates,map.getCenter().lng);let line=l.motionTrails.get(id);
    if(!line){line=L.polyline(latlngs,{renderer:trailRenderer,color:l.color,weight:followed?.id===id?3:1.5,opacity:.5,interactive:false}).addTo(l.groupLayer);l.motionTrails.set(id,line)}else line.setLatLngs(latlngs);
@@ -53,12 +53,12 @@ function updateMotionTrails(l,target){
 }
 function stopFollowing(){followed=null;if($('follow-status'))$('follow-status').hidden=true}
 function followVehicle(l,i){
- followed={layer:l.id,id:i.id};const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),vehicleType(l)==='air'?400:65)||i;
- map.setView([p.lat,p.lon],vehicleType(l)==='air'?12:15,{animate:false});
+ followed={layer:l.id,id:i.id};const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),ScoutMotion.maxSpeed(l))||i;
+ map.setView([p.lat,displayLon(p.lon)],vehicleType(l)==='satellite'?4:vehicleType(l)==='air'?12:15,{animate:false});
  $('follow-status').hidden=false;$('follow-name').textContent=i.title;
 }
 function chooseFollow(type){
- const candidates=layers.filter(l=>l.on&&moving(l)&&vehicleType(l)===type).flatMap(l=>mapped(l).map(i=>({l,i,p:ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),type==='air'?400:65)})));
+ const candidates=layers.filter(l=>l.on&&moving(l)&&vehicleType(l)===type).flatMap(l=>mapped(l).map(i=>({l,i,p:ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),ScoutMotion.maxSpeed(l))})));
  candidates.sort((a,b)=>Number(b.p?.state==='moving')-Number(a.p?.state==='moving')||Number(inView(b.i))-Number(inView(a.i)));
  const pick=candidates.find(x=>x.i.id!==followed?.id)||candidates[0];
  if(!pick)return toast('No recent vehicles of this type are available. Enable a vehicle layer.');
@@ -131,12 +131,12 @@ function animationFrame(now){
  if(now-lastMetrics>1000){
   lastMetrics=now;$('moving-count').textContent=pausedAt?'0':inMotion;$('holding-count').textContent=holding+buffering;$('new-count').textContent=newReports;
   $('playback-clock').textContent=new Date(target).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  $('motion-caption').textContent=pausedAt?'Playback paused · feeds continue updating':map.getZoom()<10?'Zoom in to see individual vehicles move':inMotion?'90s behind real time · interpolated between received positions':buffering?'Buffering observations · motion starts as the 90s buffer fills':'90s observation playback · vehicles hold when no new position is available';
+  $('motion-caption').textContent=pausedAt?'Playback paused · feeds continue updating':map.getZoom()<10&&!layers.some(l=>l.on&&l.id==='iss-orbit'&&l.vehicles?.size)?'Zoom in to see individual vehicles move':inMotion?'90s behind real time · interpolated between received positions':buffering?'Buffering observations · motion starts as the 90s buffer fills':'90s observation playback · vehicles hold when no new position is available';
   for(const l of layers.filter(l=>l.on&&l.id.endsWith('radar')))if(radarPlaying&&Date.now()>radarNextAt)advanceRadar(l);
  }
 }
 $('pause-motion').onclick=()=>{pausedAt=pausedAt?null:Date.now();pausedSamples.clear();if(pausedAt){for(const l of layers)for(const [id,m] of l.vehicles||[])if(m.playback)pausedSamples.set(l.id+':'+id,m.playback)}$('pause-motion').textContent=pausedAt?'▶ Resume':'Ⅱ Pause';$('pause-motion').setAttribute('aria-label',pausedAt?'Resume motion playback':'Pause motion playback')};
-$('follow-ship').onclick=()=>chooseFollow('ship');$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
+$('follow-iss').onclick=()=>chooseFollow('satellite');$('follow-ship').onclick=()=>chooseFollow('ship');$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
 map.on('dragstart',stopFollowing);
 $('radar-toggle').onclick=()=>{const l=layers.find(l=>l.id.endsWith('radar'));if(!l)return;l.on=!l.on;controls();sync();$('radar-toggle').classList.toggle('active',l.on);$('radar-status').hidden=!l.on;drawRadar(l)};
 $('radar-pause').onclick=()=>{radarPlaying=!radarPlaying;$('radar-pause').textContent=radarPlaying?'Pause radar':'Play radar'};

@@ -35,6 +35,10 @@ The default **Everything** view includes moving vehicles and all other available
 
 LA Metro bus and rail positions use the agency’s public WebSocket service. Each agency has one server-side connection shared across viewers. The browser refreshes its snapshot every five seconds; actual GPS observation timestamps determine freshness and motion. Connections stop after two minutes without snapshot requests and reconnect with backoff after interruption. The existing 90-second observation playback remains in effect.
 
+### Follow the International Space Station
+
+**Follow ISS** finds the station anywhere on the globe and follows its ground track at a continental zoom. The gold marker and source panel explicitly identify an **orbital model estimate**, not live on-board GPS. Where the ISS at? supplies timestamped positions, altitude and orbital speed. A shared ten-second fetch feeds the same 90-second buffered playback, with a satellite-specific speed limit and continuous date-line trails. No future position is extrapolated when reports stop.
+
 ### Public Finnish vessel stream
 
 The Gulf of Finland shortcut connects the public Fintraffic / Digitraffic AIS stream without an access key. Ship markers, trails and **Follow ship** use received position reports. Coverage follows the Finnish receiver network, with fresh vessels also visible along other Finnish coastal areas. One MQTT-over-TLS connection is shared across viewers and closes after two minutes without requests. Fintraffic attribution and the CC BY 4.0 license link appear on the map.
