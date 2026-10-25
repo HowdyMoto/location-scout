@@ -130,10 +130,13 @@ let lastDestination=null;
 function explorationPlaces(){
  return [{id:'seattle',name:'Seattle',country:'United States',timeZone:'America/Los_Angeles',description:'Buses, light rail, fire dispatch & coastal weather'},
  {id:'bay',name:'San Francisco',country:'United States',timeZone:'America/Los_Angeles',description:'Bike availability, traffic, tides & public reports'},
- ...catalog.filter(s=>s.destination).map(s=>({id:s.id,...s.destination,description:s.name}))];
+ ...catalog.filter(s=>s.destination).map(s=>({id:s.id,...s.destination,description:s.name})),
+ {id:'london-sky',name:'London skies',country:'United Kingdom',timeZone:'Europe/London',center:[51.5,-.12],zoom:10,description:'Aircraft across the London airport approaches'},
+ {id:'singapore-sky',name:'Singapore skies',country:'Singapore',timeZone:'Asia/Singapore',center:[1.35,103.82],zoom:10,description:'Aircraft around the Strait of Singapore'},
+ {id:'cape-sky',name:'Cape Town skies',country:'South Africa',timeZone:'Africa/Johannesburg',center:[-33.93,18.42],zoom:10,description:'Aircraft over the Cape; receiver coverage varies'}];
 }
 function visitDestination(p){
- lastDestination=p.id;setRegion(p.id);$('region').value='explore';
+ lastDestination=p.id;if(homes[p.id])setRegion(p.id);else{stopFollowing();map.setView(p.center,p.zoom);applyViewport()}$('region').value='explore';
  $('explore-dialog').close();toast('Exploring '+p.name+' · feeds follow your view.');
 }
 function showExplorer(){

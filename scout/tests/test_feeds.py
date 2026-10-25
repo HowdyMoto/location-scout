@@ -33,7 +33,7 @@ class FeedTests(unittest.TestCase):
 
     def test_old_aircraft_positions_dropped(self):
         d={'now':1790000000000,'ac':[{'hex':'old','lat':37.7,'lon':-122.4,'seen_pos':121},{'hex':'fresh','lat':37.8,'lon':-122.3,'seen_pos':2}]}
-        with patch.object(feeds,'fetch',return_value=d):data=feeds.aircraft()
+        with patch.object(feeds,'fetch',return_value=d), patch.object(feeds.time,'time',return_value=1790000000):data=feeds.aircraft()
         self.assertEqual([i['id'] for i in data['items']],['fresh'])
         self.assertEqual(data['items'][0]['time'],1790000000000-2000)
 

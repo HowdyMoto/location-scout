@@ -14,6 +14,7 @@ LOCKS={k:threading.Lock() for k in KINDS}
 CACHE={k:OrderedDict() for k in KINDS}
 SHARED={}
 TRACKS={}
+LAST_AIR_REQUEST=0.0
 COOLDOWN={k:0 for k in KINDS}
 
 def parse_bounds(text):
@@ -64,6 +65,7 @@ def history(items):
     return {i['id']:list(TRACKS.get(i['id'],[])) for i in items}
 
 def fetch_view(kind,b):
+    global LAST_AIR_REQUEST
     if kind in {'quake','buoys'}:
         value=shared(kind,lambda:f.quakes(GLOBE) if kind=='quake' else f.buoys(GLOBE))
         return {**value,'items':[i for i in value['items'] if contains(b,i['lat'],i['lon'])]}
@@ -74,7 +76,12 @@ def fetch_view(kind,b):
         lat,lon=center(b)
         radius=query_radius(b)
         if radius>250:return f.result([],'Zoom in to a regional view for aircraft (maximum query radius 250 nautical miles).',zoomRequired=True)
-        value=f.aircraft(GLOBE,f'{lat:.3f}/{lon:.3f}/{max(10,radius)}')
+        # The caller holds the air lock across views. Enforce the public API's
+        # one-request/second limit even during fast panning by multiple viewers.
+        delay=1.1-(time.monotonic()-LAST_AIR_REQUEST)
+        if delay>0:time.sleep(delay)
+        LAST_AIR_REQUEST=time.monotonic()
+        value=f.aircraft(GLOBE,f'{lat:.3f}/{lon:.3f}/{max(10,radius)}',provider='adsb.fi')
         value['items']=[i for i in value['items'] if contains(b,i['lat'],i['lon'])]
         value['history']=history(value['items'])
         return value

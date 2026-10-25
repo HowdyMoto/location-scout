@@ -161,3 +161,13 @@ Remaining global expansion: additional continents and public transit providers; 
 - Both use 20-second shared server caching, approximate regional footprints, per-vehicle timestamps, five-minute expiry and the existing bounded motion history. Neither converts schedules into invented positions.
 - World explorer: available from the map in every region, with eight connected destinations, local time zones, source descriptions and a manual Surprise me action. It does not claim every destination has active vehicles at all hours. The map stays freely pannable outside these shortcuts.
 - Further Malaysian BAS.MY Johor and Melaka probes returned no fresh positions; these remain unconnected pending usable observations.
+
+### Worldwide aircraft restored with adsb.fi
+
+The viewport aircraft layer now uses the documented public regional endpoint from adsb.fi: `https://opendata.adsb.fi/api/v3/lat/{lat}/lon/{lon}/dist/{nautical_miles}`. Documentation and terms: https://github.com/adsbfi/opendata/blob/main/README.md. Attribution: https://adsb.fi.
+
+The public service is for personal, noncommercial use only. This local prototype uses that service; a commercial deployment needs suitable provider permission/access. The server serializes aircraft requests across viewports and spaces upstream calls by at least 1.1 seconds, caches each view for 30 seconds, and honors shared backoff. There is no attempt to rotate identities or evade limits. Regional radius remains capped at 250 NM. The old regional compatibility endpoints still use adsb.lol; the visible worldwide layer uses adsb.fi.
+
+Aircraft feed clocks must be recent, and each aircraft needs a finite nonnegative position age no greater than 120 seconds. No feed time is fabricated when missing. The existing observation playback uses received positions and holds on gaps. Source attribution and noncommercial limits appear in source notes and record summaries.
+
+Live API checks returned aircraft around London, Singapore and Cape Town (135, 7 and 5 respectively during verification). Counts vary and do not establish complete coverage. Added sky destinations for those areas to the world explorer. Remaining work includes wider local source coverage, worldwide weather animation, and production-grade access for a public commercial deployment.

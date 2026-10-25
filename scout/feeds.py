@@ -95,19 +95,30 @@ def civic():
     rows, capped = socrata('vw6y-z8j6', 'requested_datetime', 3)
     return result([point(r['service_request_id'], r.get('lat'), r.get('long'), r.get('service_name', '311 report'), f"{r.get('address', '')} · {r.get('service_subtype', '')} · {r.get('status_description', 'Unknown status')}. Public request, not a verified finding.", stamp(r.get('requested_datetime'), True), summary=r.get('analysis_neighborhood', 'SF 311')) for r in rows], 'Last 72h; daily dataset, not live dispatch.' + (' Capped at 5,000 reports.' if capped else ''))
 
-def aircraft(bounds=BBOX, center='37.8/-122.3/65'):
-    d = fetch('https://api.adsb.lol/v2/point/'+center)
-    if 'ac' not in d:
+def aircraft(bounds=BBOX, center='37.8/-122.3/65', provider='adsb.lol'):
+    if provider == 'adsb.fi':
+        lat, lon, radius = center.split('/')
+        url = f'https://opendata.adsb.fi/api/v3/lat/{lat}/lon/{lon}/dist/{radius}'
+    elif provider == 'adsb.lol':
+        url = 'https://api.adsb.lol/v2/point/'+center
+    else:
+        raise ValueError('Unknown aircraft provider')
+    d = fetch(url)
+    if not isinstance(d.get('ac'),list):
         raise ValueError('Aircraft list missing')
     items = []
+    now = d.get('now')
+    if not isinstance(now,(int,float)) or not math.isfinite(now) or abs(time.time()*1000-now)>180000:
+        raise ValueError('Aircraft feed timestamp is missing or stale')
     for a in d['ac']:
-        if a.get('seen_pos', 9999) > 120:
+        age = a.get('seen_pos')
+        if not isinstance(age,(int,float)) or not math.isfinite(age) or not 0<=age<=120:
             continue
         title = (a.get('flight') or a.get('r') or a.get('hex', 'Aircraft')).strip()
         items.append(point(a.get('hex'), a.get('lat'), a.get('lon'), title,
             f"{a.get('t', 'Broadcast target')} · {'on ground' if a.get('alt_baro') == 'ground' else str(a.get('alt_baro', 'unknown')) + ' ft'} · {a.get('gs', 'unknown')} knots. Broadcast ADS-B/MLAT position; incomplete reception coverage.",
-            int(d.get('now', time.time()*1000) - a.get('seen_pos', 0)*1000), bounds=bounds,summary='Aircraft · adsb.lol', heading=a.get('track')))
-    return result(items, 'Regional ADS-B receiver query. Positions older than 2 minutes omitted. © adsb.lol contributors · ODbL.')
+            int(now-age*1000), bounds=bounds,summary='Aircraft · '+provider, heading=a.get('track')))
+    return result(items, 'Regional ADS-B receiver query; reception coverage varies. Positions older than 2 minutes omitted. '+('Data: adsb.fi — https://adsb.fi · personal, noncommercial use only.' if provider=='adsb.fi' else '© adsb.lol contributors · ODbL.'))
 
 def bikes():
     base = 'https://gbfs.lyft.com/gbfs/2.3/bay/en/'
