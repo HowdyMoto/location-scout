@@ -245,3 +245,12 @@ Initial direct verification found 1,718 fresh reports, and the integrated endpoi
 Malaysia's documented official feeds were rechecked during local overnight hours: KTMB, Rapid KL and Penang were empty, while MRT feeder, Johor and Kuching samples were stale. They remain candidates rather than verified live integrations. Official endpoint documentation: https://developer.data.gov.my/realtime-api/gtfs-realtime .
 
 A consecutive integrated snapshot contained 1,654 fresh reports; 1,423 matching vehicles changed coordinates with newer timestamps. Browser playback showed 322 moving objects in the Amsterdam view and successfully followed a Dutch transit vehicle with a moving state. No console errors were reported in this check.
+
+
+### Discovery based on observed activity
+
+World-explorer cards use already-fetched source snapshots to count reports within 50 km of each destination. Only healthy snapshots fetched in the last five minutes qualify; individual reports must satisfy the stricter of five minutes or their source age limit. Stale/unavailable, access-required, coverage-unavailable and zoom-limited responses never count as fresh activity. Aircraft counts also require the destination to lie within the actual requested view. Station availability is identified separately from moving vehicles.
+
+Movement counts use the same 90-second interpolation and gap/speed rejection as map playback. Surprise me prefers destinations with observed movement, then fresh vehicles, then fresh station reports, and falls back to other destinations when no checked activity is available. This does not claim a quiet/unchecked area has no activity. Badges update in place while the dialog is open, without extra network requests or reordering focused controls.
+
+Browser verification showed badges updating in place for transit, ships and bikes, an unavailable Bordeaux feed, and unchecked sky views. Surprise me opened the Netherlands, where moving playback was visible. No browser console errors were reported. Five new deterministic cases cover geographic filtering, stale/future timestamps, stationary and impossible tracks, date-line distance, unavailable/unchecked sources and activity-based selection.

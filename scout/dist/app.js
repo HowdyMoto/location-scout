@@ -52,6 +52,7 @@ function draw(l){
 function displayLon(lon){return lon+360*Math.round((map.getCenter().lng-lon)/360)}
 function inView(i){if(map.getBounds().contains([i.lat,displayLon(i.lon)]))return true;if(i.geometry){try{const b=L.geoJSON(i.geometry).getBounds();return b.isValid()&&map.getBounds().intersects(b)}catch{return false}}return false}
 function feed(){
+  updateExplorerActivity();
   const items=layers.filter(l=>l.on).flatMap(l=>mapped(l).filter(inView).map(i=>({l,i}))).sort((a,b)=>(b.i.time||0)-(a.i.time||0));
   $('signal-count').textContent=items.length.toLocaleString();$('visible-count').textContent=`${items.length.toLocaleString()} signals in view`;$('layer-count').textContent=layers.filter(l=>l.on).length;
   const groups=layers.filter(l=>l.on).sort((a,b)=>(moving(a)?1:0)-(moving(b)?1:0)).map(l=>items.filter(x=>x.l.id===l.id));

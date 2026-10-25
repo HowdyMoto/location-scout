@@ -36,3 +36,36 @@ test('trails remain continuous across the date line in either displayed world co
  }
  assert.deepEqual(M.trailCoordinates([],0),[]);
 });
+
+test('discovery activity counts only fresh nearby vehicles and verified playback motion',()=>{
+ const now=t+120000,one={id:'v',...b,time:t+60000},far={...one,id:'far',lat:0,lon:0};
+ const layer={id:'bus',motion:true,status:'ok',fetchedAt:now,maxAge:300,items:[one,far,{...one,id:'old',time:now-301000},{...one,id:'future',time:now+61000},{...one,id:'missing',time:null}],trails:new Map([['v',[a,one]]])};
+ assert.deepEqual(M.activity([layer],[a.lat,a.lon],now),{vehicles:1,moving:1,stations:0,checked:true,unavailable:false});
+ layer.trails.set('v',[{...one,time:t},one]);assert.equal(M.activity([layer],[a.lat,a.lon],now).moving,0);
+ layer.trails.set('v',[{...a,lat:49},one]);assert.equal(M.activity([layer],[a.lat,a.lon],now).moving,0);
+});
+test('discovery never promotes failed or expired feeds, and station counts are not vehicles',()=>{
+ const layer={id:'bikes',adapter:'gbfs',status:'ok',fetchedAt:t,maxAge:300,items:[{...a,availability:{bikes:3}}]};
+ assert.deepEqual(M.activity([layer],[a.lat,a.lon],t),{vehicles:0,moving:0,stations:1,checked:true,unavailable:false});
+ for(const status of ['stale','unavailable']){const result=M.activity([{...layer,status}],[a.lat,a.lon],t);assert.equal(result.stations,0);assert.equal(result.unavailable,true)}
+ assert.equal(M.activity([layer],[a.lat,a.lon],t+301000).checked,false);
+ assert.equal(M.activity([{...layer,status:'loading'}],[a.lat,a.lon],t).stations,0);
+});
+test('activity near the date line uses geographic distance',()=>{
+ const layer={motion:true,status:'ok',fetchedAt:t,items:[{id:'v',lat:0,lon:-179.9,time:t}]};
+ assert.equal(M.activity([layer],[0,179.9],t).vehicles,1);
+});
+test('surprise prioritizes movement, then fresh reports, and always allows unchecked destinations',()=>{
+ const places=[{id:'unknown'},{id:'bikes',activity:{stations:10}},{id:'bus',activity:{vehicles:2}},{id:'moving',activity:{vehicles:1,moving:1}}];
+ assert.deepEqual(M.activeDestinations(places,null).map(p=>p.id),['moving']);
+ assert.deepEqual(M.activeDestinations(places,'moving').map(p=>p.id),['bus']);
+ assert.deepEqual(M.activeDestinations(places.slice(0,2),null).map(p=>p.id),['bikes']);
+ assert.deepEqual(M.activeDestinations(places.slice(0,1),null).map(p=>p.id),['unknown']);
+ assert.deepEqual(M.activeDestinations(places.slice(0,1),'unknown'),[]);
+});
+
+test('unqueried aircraft, coverage gaps and missing access never imply a quiet destination',()=>{
+ const layer={motion:true,status:'ok',fetchedAt:t,items:[]};
+ for(const flag of ['zoomRequired','coverageUnavailable','configurationRequired'])assert.equal(M.activity([{...layer,[flag]:true}],[0,0],t).checked,false);
+ assert.equal(M.activity([{id:'bikes',status:'ok',fetchedAt:t,items:[a]}],[a.lat,a.lon],t).stations,1);
+});

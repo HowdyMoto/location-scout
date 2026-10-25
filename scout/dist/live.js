@@ -179,16 +179,34 @@ function visitDestination(p){
  lastDestination=p.id;if(homes[p.id])setRegion(p.id);else{stopFollowing();map.setView(p.center,p.zoom);applyViewport()}$('region').value='explore';
  $('explore-dialog')?.close();map.closePopup();toast('Exploring '+p.name+' · feeds follow your view.');
 }
+function destinationActivity(p){
+ const center=p.center||homes[p.id]?.center;
+ const sources=allLayers.filter(l=>l.id===p.id||l.region===p.id||(p.id.endsWith('-sky')&&l.id==='world-air'&&l.queryKey&&center&&ScoutExplore.contains(l.queryKey.split(',').map(Number),[center[1],center[0],center[1]+.000001,center[0]+.000001])));
+ return ScoutMotion.activity(sources,center);
+}
+function activityLabel(a){
+ if(a.vehicles)return `${a.vehicles.toLocaleString()} recent vehicles · ${a.moving.toLocaleString()} moving in playback`;
+ if(a.stations)return `${a.stations.toLocaleString()} stations reporting availability`;
+ if(a.unavailable)return 'Feed unavailable · try another place';
+ return a.checked?'No fresh local reports in the last check':'Explore coverage · activity not checked yet';
+}
+function updateExplorerActivity(){
+ const dialog=$('explore-dialog');if(!dialog?.open)return;
+ for(const p of explorationPlaces()){
+  const badge=dialog.querySelector(`[data-activity="${p.id}"]`);if(!badge)continue;
+  const a=destinationActivity(p);badge.textContent=activityLabel(a);badge.classList.toggle('has-activity',a.vehicles+a.stations>0);
+ }
+}
 function showExplorer(){
  let dialog=$('explore-dialog');
  if(!dialog){dialog=document.createElement('dialog');dialog.id='explore-dialog';dialog.setAttribute('aria-labelledby','explorer-title');document.body.append(dialog)}
  const places=explorationPlaces();
- dialog.innerHTML=`<div class="explore-heading"><div><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h2 id="explorer-title">A different place. A different rhythm.</h2><p>Jump into connected cities. Local times help you find the world awake.</p></div><button id="close-explorer" aria-label="Close world explorer">×</button></div><button id="surprise-place" class="surprise-place">↗ Surprise me</button><div class="explore-grid">${places.map(p=>{
+ dialog.innerHTML=`<div class="explore-heading"><div><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h2 id="explorer-title">A different place. A different rhythm.</h2><p>Find fresh reports near each destination. Surprise me favors places with observed movement.</p></div><button id="close-explorer" aria-label="Close world explorer">×</button></div><button id="surprise-place" class="surprise-place">↗ Surprise me</button><div class="explore-grid">${places.map(p=>{
  const localTime=new Intl.DateTimeFormat([],{hour:'numeric',minute:'2-digit',timeZone:p.timeZone}).format(new Date());
- return `<button class="explore-place" data-destination="${esc(p.id)}"><small>${esc(p.country)} · ${esc(localTime)} local</small><strong>${esc(p.name)} ↗</strong><span>${esc(p.description)}</span></button>`;
- }).join('')}</div><p class="explore-note">Actual observations, with source timestamps. Transit can be quiet overnight; some feeds may be unavailable. You can also pan anywhere for global layers.</p>`;
+ return `<button class="explore-place" data-destination="${esc(p.id)}"><small>${esc(p.country)} · ${esc(localTime)} local</small><strong>${esc(p.name)} ↗</strong><span>${esc(p.description)}</span><span class="explore-activity" data-activity="${esc(p.id)}"></span></button>`;
+ }).join('')}</div><p class="explore-note">Counts cover fresh reports within 50 km of each destination, from feeds already checked. Movement uses 90-second observation playback. Unchecked or quiet places are still explorable; pan anywhere for global layers.</p>`;
  $('close-explorer').onclick=()=>dialog.close();
  dialog.querySelectorAll('[data-destination]').forEach(b=>b.onclick=()=>visitDestination(places.find(p=>p.id===b.dataset.destination)));
- $('surprise-place').onclick=()=>{const candidates=places.filter(p=>p.id!==lastDestination);visitDestination(candidates[Math.floor(Math.random()*candidates.length)])};
- dialog.showModal();
+ $('surprise-place').onclick=()=>{const candidates=ScoutMotion.activeDestinations(places.map(p=>({...p,activity:destinationActivity(p)})),lastDestination);if(candidates.length)visitDestination(candidates[Math.floor(Math.random()*candidates.length)])};
+ dialog.showModal();updateExplorerActivity();
 }

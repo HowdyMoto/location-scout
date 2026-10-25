@@ -36,6 +36,29 @@
   if(!old?.availability||!item.availability||!Number.isFinite(old.time)||!Number.isFinite(item.time)||item.time<=old.time)return false;
   return ['bikes','docks','renting','returning'].some(key=>old.availability[key]!==item.availability[key]);
  }
- const api={distance,bearing,merge,sample,balanced,availabilityChanged,wrapLongitude,trailCoordinates};
+ function activity(layers,center,now=Date.now()){
+  const result={vehicles:0,moving:0,stations:0,checked:false,unavailable:false};
+  if(!center)return result;
+  for(const l of layers){
+   if(!l.motion&&l.adapter!=='gbfs'&&l.id!=='bikes')continue;
+   if(l.zoomRequired||l.coverageUnavailable||l.configurationRequired)continue;
+   if(['stale','unavailable'].includes(l.status)){result.unavailable=true;continue}
+   if(!['ok','partial'].includes(l.status)||!Number.isFinite(l.fetchedAt)||now-l.fetchedAt>300000)continue;
+   result.checked=true;
+   for(const i of l.items||[]){
+    if(!Number.isFinite(i.time)||now-i.time>Math.min(l.maxAge||300,300)*1000||i.time>now+60000||!Number.isFinite(i.lat)||!Number.isFinite(i.lon))continue;
+    if(distance({lat:center[0],lon:center[1]},i)>50000)continue;
+    if(l.motion){result.vehicles++;if(sample(l.trails?.get(i.id)||[i],now-90000,l.id==='world-air'?400:65)?.state==='moving')result.moving++}
+    else if(i.availability||l.id==='bikes')result.stations++;
+   }
+  }
+  return result;
+ }
+ function activeDestinations(places,lastId){
+  const candidates=places.filter(p=>p.id!==lastId);
+  for(const field of ['moving','vehicles','stations']){const active=candidates.filter(p=>p.activity?.[field]>0);if(active.length)return active}
+  return candidates;
+ }
+ const api={distance,bearing,merge,sample,balanced,availabilityChanged,wrapLongitude,trailCoordinates,activity,activeDestinations};
  if(typeof module!=='undefined')module.exports=api;else root.ScoutMotion=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
