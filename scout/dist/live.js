@@ -67,7 +67,7 @@ function chooseFollow(type){
 function updateScenes(){
  const scenes=activeRegion==='seattle'?[
   ['City pulse',[47.607,-122.333],13],['Sea-Tac approaches',[47.45,-122.30],11],['Across the Sound',[47.66,-122.50],11]
- ]:activeRegion==='bay'?[['City pulse',[37.78,-122.42],13],['SFO approaches',[37.62,-122.38],11],['Across the Bay',[37.82,-122.25],10]]:[['Seattle',[47.61,-122.33],11],['San Francisco',[37.78,-122.42],12],['London',[51.5,-.12],11],['Tokyo',[35.68,139.76],11]];
+ ]:activeRegion==='bay'?[['City pulse',[37.78,-122.42],13],['SFO approaches',[37.62,-122.38],11],['Across the Bay',[37.82,-122.25],10]]:[['Seattle',[47.61,-122.33],11],['San Francisco',[37.78,-122.42],12],...catalog.filter(s=>s.destination).map(s=>[s.destination.name,s.destination.center,s.destination.zoom])];
  $('scene-bar').innerHTML=scenes.map((s,n)=>`<button data-scene="${n}">${s[0]}</button>`).join('');
  document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{stopFollowing();const s=scenes[+b.dataset.scene];map.flyTo(s[1],s[2],{duration:1});$('place').textContent=s[0]});
 }

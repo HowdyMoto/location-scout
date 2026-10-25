@@ -136,3 +136,20 @@ New `/api/world-{kind}?bbox=west,south,east,north` routes accept only eight fixe
 Live checks: SF city feeds automatically loaded after coordinate search; London weather and Tokyo air-quality models returned nine samples each; a date-line earthquake view returned 18 events. Aircraft calls returned HTTP 429, so worldwide aircraft rendering could not be live-verified in this run. The existing decoder is reused with explicit global bounds; outage handling is tested and honors Retry-After across views. An independent Airplanes.live probe returned HTTP 403 and was not integrated.
 
 Regional-only sources retain their existing access restrictions, including WSDOT and AISStream credentials. Exploring a new city does not imply local transit / dispatch coverage there.
+
+## International vehicle motion (2026-10-25)
+
+Sources with `adapter: "gtfs-rt"` in `scout/dist/sources.json` use the shared `scout/transit.py` adapter. Their `bounds` and optional `coverageBounds` select feeds from the map viewport; `destination` adds an exploration shortcut. The server caches each source across viewers and retains timestamped motion history. Each vehicle must have its own recent observation timestamp; feed-header timestamps are not substituted. Differential feeds are rejected until a stateful adapter is implemented.
+
+| Source | Official documentation | Refresh | Coverage limits |
+| --- | --- | --- | --- |
+| HSL | https://hsldevcom.github.io/gtfs_rt/ | 15 seconds | Helsinki region; only reported vehicles |
+| MBTA | https://www.mbta.com/developers/gtfs-realtime | 20 seconds | Boston region; only reported vehicles |
+| Adelaide Metro – Department for Infrastructure and Transport, South Australia | https://www.adelaidemetro.com.au/developer-info | 30 seconds | Adelaide; fewer vehicles outside service hours |
+| Entur | https://developer.entur.no/open-data/realtime | 20 seconds | Participating Norwegian operators, not every operator or service |
+
+All four returned fresh GPS records through the Scout API during integration. Geographic footprints are approximate selection areas, not guarantees of reception. Norway uses multiple rectangles to avoid activating its nationwide feed over Helsinki. Route IDs are labeled as provider IDs until static route metadata is connected.
+
+Malaysia official GTFS endpoints were also investigated (https://developer.data.gov.my/realtime-api/gtfs-realtime.en). At the time of probing, KL, Penang and KTMB feeds were empty, MRT feeder data was stale, and Kuantan returned 404. These are not advertised as working integrations. Recheck during service hours before connecting them.
+
+Remaining global expansion: additional continents and public transit providers; reliable worldwide aircraft coverage; ships with licensed access; worldwide animated weather; discovery destinations showing current source health; shared ingestion suitable for a deployed multi-user service. Current loopback server caches across local viewers but is not yet that deployment architecture.

@@ -1116,5 +1116,162 @@
     "access": "integrated",
     "region": "world",
     "viewport": true
+  },
+  {
+    "id": "hsl-vehicles",
+    "name": "Helsinki transit",
+    "source": "HSL",
+    "endpoint": "https://realtime.hsl.fi/realtime/vehicle-positions/v2/hsl",
+    "url": "https://hsldevcom.github.io/gtfs_rt/",
+    "bounds": [
+      23.5,
+      59.8,
+      26.5,
+      61.2
+    ],
+    "destination": {
+      "name": "Helsinki",
+      "center": [
+        60.17,
+        24.94
+      ],
+      "zoom": 12
+    },
+    "adapter": "gtfs-rt",
+    "region": "hsl-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 15,
+    "maxAge": 300,
+    "coverage": "Helsinki region",
+    "notes": "Timestamped GPS observations. Coverage varies by route and service hours; stale positions are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
+  },
+  {
+    "id": "mbta-vehicles",
+    "name": "Boston transit",
+    "source": "MBTA",
+    "endpoint": "https://cdn.mbta.com/realtime/VehiclePositions.pb",
+    "url": "https://www.mbta.com/developers/gtfs-realtime",
+    "bounds": [
+      -72.6,
+      41.4,
+      -70,
+      43.1
+    ],
+    "destination": {
+      "name": "Boston",
+      "center": [
+        42.355,
+        -71.065
+      ],
+      "zoom": 12
+    },
+    "adapter": "gtfs-rt",
+    "region": "mbta-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Boston region",
+    "notes": "Timestamped GPS observations. Coverage varies by route and service hours; stale positions are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
+  },
+  {
+    "id": "adelaide-vehicles",
+    "name": "Adelaide transit",
+    "source": "Adelaide Metro – Department for Infrastructure and Transport, South Australia",
+    "endpoint": "https://gtfs.adelaidemetro.com.au/v1/realtime/vehicle_positions",
+    "url": "https://www.adelaidemetro.com.au/developer-info",
+    "bounds": [
+      138,
+      -36,
+      140,
+      -34
+    ],
+    "destination": {
+      "name": "Adelaide",
+      "center": [
+        -34.925,
+        138.6
+      ],
+      "zoom": 12
+    },
+    "adapter": "gtfs-rt",
+    "region": "adelaide-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 30,
+    "maxAge": 300,
+    "coverage": "Adelaide region",
+    "notes": "Timestamped GPS observations. Coverage varies by route and service hours; stale positions are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
+  },
+  {
+    "id": "entur-vehicles",
+    "name": "Norway transit",
+    "source": "Entur / participating Norwegian operators",
+    "endpoint": "https://api.entur.io/realtime/v1/gtfs-rt/vehicle-positions",
+    "url": "https://developer.entur.no/open-data/realtime",
+    "bounds": [
+      4,
+      57,
+      32,
+      72
+    ],
+    "destination": {
+      "name": "Trondheim",
+      "center": [
+        63.43,
+        10.395
+      ],
+      "zoom": 12
+    },
+    "adapter": "gtfs-rt",
+    "region": "entur-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Norway; participating operators",
+    "notes": "Timestamped GPS observations. Coverage varies by route and service hours; stale positions are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true,
+    "coverageBounds": [
+      [
+        4,
+        57,
+        12,
+        64
+      ],
+      [
+        10,
+        62,
+        16,
+        68
+      ],
+      [
+        14,
+        66,
+        32,
+        72
+      ]
+    ],
+    "areaName": "Norway"
   }
 ]

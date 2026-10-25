@@ -106,16 +106,18 @@ function cancelLoad(l){
 
 function preset(p){selectedPreset=p;allLayers.forEach(l=>l.on=p==='all'?true:p==='default'?(moving(l)||l.kind==='Live'&&l.group==='Safety'):p==='move'?moving(l):['Earth','Water'].includes(l.group));document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('active',b.dataset.preset===p));controls();sync()}
 document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>preset(b.dataset.preset));$('reset').onclick=()=>preset('all');$('refresh').onclick=()=>refresh(true);
+function centerLon(){return ScoutExplore.wrap(map.getCenter().lng)}
 function currentBounds(){const b=map.getBounds();return ScoutExplore.normalize(b.getWest(),b.getSouth(),b.getEast(),b.getNorth())}
 function applyViewport(){
  if(!allLayers.length)return;
  const bounds=currentBounds(),next=allLayers.filter(l=>ScoutExplore.applies(l,bounds));
+ const destinations=next.filter(l=>l.destination&&ScoutExplore.applies(l,[centerLon(),map.getCenter().lat,centerLon()+.000001,map.getCenter().lat+.000001]));
  const regions=Object.keys(ScoutExplore.regions).filter(k=>ScoutExplore.intersects(bounds,ScoutExplore.regions[k]));
  const center=map.getCenter();activeRegion=regions.length===1?regions[0]:'world';home=homes[activeRegion]||homes.seattle;
  document.querySelector('.brand small').textContent='EXPLORE';
- $('place').textContent=map.getZoom()<=4?'World explorer':regions.length===1?homes[regions[0]].name:regions.length>1?'West Coast & beyond':`${center.lat.toFixed(2)}°, ${ScoutExplore.wrap(center.lng).toFixed(2)}°`;
+ $('place').textContent=map.getZoom()<=4?'World explorer':destinations.length===1?(destinations[0].areaName||destinations[0].destination.name):regions.length===1?homes[regions[0]].name:regions.length>1?'West Coast & beyond':`${center.lat.toFixed(2)}°, ${ScoutExplore.wrap(center.lng).toFixed(2)}°`;
  $('transit-credit').hidden=!regions.includes('seattle');
- document.querySelector('.coverage p').textContent='Feeds follow your map automatically. Global reception varies; city-specific transit and dispatch are currently connected in Seattle and the Bay Area. Delayed and modeled data stay labeled.';
+ document.querySelector('.coverage p').textContent='Feeds follow your map automatically. Global reception varies; local sources connect automatically where available. Transit coverage varies by operator and service hours. Delayed and modeled data stay labeled.';
  let changed=layers.map(l=>l.id).join()!==next.map(l=>l.id).join();
  for(const l of layers)if(!next.includes(l)){cancelLoad(l);map.removeLayer(l.groupLayer)}
  layers=next;
@@ -152,4 +154,4 @@ function showSources(){
 }
 $('sources').onclick=()=>{showSources();$('source-dialog').showModal()};$('source-query').oninput=showSources;$('source-dialog').querySelector('.close').onclick=()=>$('source-dialog').close();$('open-catalog').onclick=$('sources').onclick;
 function clock(){$('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',timeZoneName:'short'})}clock();setInterval(clock,1000);
-async function boot(){try{const r=await fetch('sources.json');if(!r.ok)throw Error();catalog=await r.json();allLayers=catalog.filter(s=>s.access==='integrated'&&!s.supersededBy).map(s=>({...s,on:true,items:[],status:'loading',next:0,groupLayer:L.layerGroup()}));setRegion('seattle');setInterval(()=>{refresh();layers.filter(l=>l.on&&moving(l)).forEach(draw);feed()},5000)}catch{toast('Source catalog failed to load. Start the Scout server and refresh.')}}
+async function boot(){try{const r=await fetch('sources.json');if(!r.ok)throw Error();catalog=await r.json();for(const s of catalog.filter(s=>s.destination)){homes[s.id]={...s.destination};const option=document.createElement('option');option.value=s.id;option.textContent=s.destination.name+' · live transit';$('region').append(option)}allLayers=catalog.filter(s=>s.access==='integrated'&&!s.supersededBy).map(s=>({...s,on:true,items:[],status:'loading',next:0,groupLayer:L.layerGroup()}));setRegion('seattle');setInterval(()=>{refresh();layers.filter(l=>l.on&&moving(l)).forEach(draw);feed()},5000)}catch{toast('Source catalog failed to load. Start the Scout server and refresh.')}}
