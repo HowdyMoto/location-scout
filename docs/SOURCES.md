@@ -153,3 +153,11 @@ All four returned fresh GPS records through the Scout API during integration. Ge
 Malaysia official GTFS endpoints were also investigated (https://developer.data.gov.my/realtime-api/gtfs-realtime.en). At the time of probing, KL, Penang and KTMB feeds were empty, MRT feeder data was stale, and Kuantan returned 404. These are not advertised as working integrations. Recheck during service hours before connecting them.
 
 Remaining global expansion: additional continents and public transit providers; reliable worldwide aircraft coverage; ships with licensed access; worldwide animated weather; discovery destinations showing current source health; shared ingestion suitable for a deployed multi-user service. Current loopback server caches across local viewers but is not yet that deployment architecture.
+
+### South America and France expansion
+
+- Rio de Janeiro SMTR: official beta GTFS Realtime vehicle positions at `https://dados.mobilidade.rio/gtfs/realtime/onibus/vehicle-positions`; documentation: https://www.data.rio/documents/997bc16cc4344a5cb0e48ab06cbdfd1f/about. Approximately 1,700 fresh unique buses returned during verification. Snapshot counts fluctuate.
+- TBM / Bordeaux Métropole: https://transport.data.gouv.fr/resources/83026 links the public vehicle feed. Its `opendata-bordeaux-metropole-flux-gtfs-rt` API parameter is the publicly published open-data access value, not a personal credential. Approximately 200 fresh vehicles returned during verification.
+- Both use 20-second shared server caching, approximate regional footprints, per-vehicle timestamps, five-minute expiry and the existing bounded motion history. Neither converts schedules into invented positions.
+- World explorer: available from the map in every region, with eight connected destinations, local time zones, source descriptions and a manual Surprise me action. It does not claim every destination has active vehicles at all hours. The map stays freely pannable outside these shortcuts.
+- Further Malaysian BAS.MY Johor and Melaka probes returned no fresh positions; these remain unconnected pending usable observations.

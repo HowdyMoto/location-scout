@@ -1135,7 +1135,9 @@
         60.17,
         24.94
       ],
-      "zoom": 12
+      "zoom": 12,
+      "country": "Finland",
+      "timeZone": "Europe/Helsinki"
     },
     "adapter": "gtfs-rt",
     "region": "hsl-vehicles",
@@ -1169,7 +1171,9 @@
         42.355,
         -71.065
       ],
-      "zoom": 12
+      "zoom": 12,
+      "country": "United States",
+      "timeZone": "America/New_York"
     },
     "adapter": "gtfs-rt",
     "region": "mbta-vehicles",
@@ -1203,7 +1207,9 @@
         -34.925,
         138.6
       ],
-      "zoom": 12
+      "zoom": 12,
+      "country": "Australia",
+      "timeZone": "Australia/Adelaide"
     },
     "adapter": "gtfs-rt",
     "region": "adelaide-vehicles",
@@ -1237,7 +1243,9 @@
         63.43,
         10.395
       ],
-      "zoom": 12
+      "zoom": 12,
+      "country": "Norway",
+      "timeZone": "Europe/Oslo"
     },
     "adapter": "gtfs-rt",
     "region": "entur-vehicles",
@@ -1273,5 +1281,77 @@
       ]
     ],
     "areaName": "Norway"
+  },
+  {
+    "id": "rio-vehicles",
+    "name": "Rio buses",
+    "source": "Rio de Janeiro SMTR",
+    "endpoint": "https://dados.mobilidade.rio/gtfs/realtime/onibus/vehicle-positions",
+    "url": "https://www.data.rio/documents/997bc16cc4344a5cb0e48ab06cbdfd1f/about",
+    "bounds": [
+      -44,
+      -23.2,
+      -42.8,
+      -22.4
+    ],
+    "destination": {
+      "name": "Rio de Janeiro",
+      "center": [
+        -22.91,
+        -43.19
+      ],
+      "zoom": 12,
+      "country": "Brazil",
+      "timeZone": "America/Sao_Paulo"
+    },
+    "adapter": "gtfs-rt",
+    "region": "rio-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Rio de Janeiro region",
+    "notes": "Actual timestamped vehicle GPS reports. Service coverage varies. Observations older than five minutes are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
+  },
+  {
+    "id": "bordeaux-vehicles",
+    "name": "Bordeaux buses & trams",
+    "source": "TBM / Bordeaux Métropole",
+    "endpoint": "https://bdx.mecatran.com/utw/ws/gtfsfeed/vehicles/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt",
+    "url": "https://transport.data.gouv.fr/resources/83026",
+    "bounds": [
+      -1,
+      44.5,
+      0,
+      45.3
+    ],
+    "destination": {
+      "name": "Bordeaux",
+      "center": [
+        44.84,
+        -0.58
+      ],
+      "zoom": 12,
+      "country": "France",
+      "timeZone": "Europe/Paris"
+    },
+    "adapter": "gtfs-rt",
+    "region": "bordeaux-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Bordeaux region",
+    "notes": "Actual timestamped vehicle GPS reports. Service coverage varies. Observations older than five minutes are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
   }
 ]

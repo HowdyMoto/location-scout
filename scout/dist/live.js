@@ -68,7 +68,8 @@ function updateScenes(){
  const scenes=activeRegion==='seattle'?[
   ['City pulse',[47.607,-122.333],13],['Sea-Tac approaches',[47.45,-122.30],11],['Across the Sound',[47.66,-122.50],11]
  ]:activeRegion==='bay'?[['City pulse',[37.78,-122.42],13],['SFO approaches',[37.62,-122.38],11],['Across the Bay',[37.82,-122.25],10]]:[['Seattle',[47.61,-122.33],11],['San Francisco',[37.78,-122.42],12],...catalog.filter(s=>s.destination).map(s=>[s.destination.name,s.destination.center,s.destination.zoom])];
- $('scene-bar').innerHTML=scenes.map((s,n)=>`<button data-scene="${n}">${s[0]}</button>`).join('');
+ $('scene-bar').innerHTML='<button id="explore-world">◎ Explore the world</button>'+scenes.slice(0,4).map((s,n)=>`<button data-scene="${n}">${s[0]}</button>`).join('');
+ $('explore-world').onclick=showExplorer;
  document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{stopFollowing();const s=scenes[+b.dataset.scene];map.flyTo(s[1],s[2],{duration:1});$('place').textContent=s[0]});
 }
 function drawRadar(l){
@@ -124,3 +125,27 @@ $('radar-pause').onclick=()=>{radarPlaying=!radarPlaying;$('radar-pause').textCo
 if(matchMedia('(prefers-reduced-motion: reduce)').matches){pausedAt=Date.now();$('pause-motion').textContent='▶ Resume';$('pause-motion').setAttribute('aria-label','Resume motion playback');radarPlaying=false;$('radar-pause').textContent='Play radar'}
 requestAnimationFrame(animationFrame);
 boot();
+
+let lastDestination=null;
+function explorationPlaces(){
+ return [{id:'seattle',name:'Seattle',country:'United States',timeZone:'America/Los_Angeles',description:'Buses, light rail, fire dispatch & coastal weather'},
+ {id:'bay',name:'San Francisco',country:'United States',timeZone:'America/Los_Angeles',description:'Bike availability, traffic, tides & public reports'},
+ ...catalog.filter(s=>s.destination).map(s=>({id:s.id,...s.destination,description:s.name}))];
+}
+function visitDestination(p){
+ lastDestination=p.id;setRegion(p.id);$('region').value='explore';
+ $('explore-dialog').close();toast('Exploring '+p.name+' · feeds follow your view.');
+}
+function showExplorer(){
+ let dialog=$('explore-dialog');
+ if(!dialog){dialog=document.createElement('dialog');dialog.id='explore-dialog';dialog.setAttribute('aria-labelledby','explorer-title');document.body.append(dialog)}
+ const places=explorationPlaces();
+ dialog.innerHTML=`<div class="explore-heading"><div><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h2 id="explorer-title">A different place. A different rhythm.</h2><p>Jump into connected cities. Local times help you find the world awake.</p></div><button id="close-explorer" aria-label="Close world explorer">×</button></div><button id="surprise-place" class="surprise-place">↗ Surprise me</button><div class="explore-grid">${places.map(p=>{
+ const localTime=new Intl.DateTimeFormat([],{hour:'numeric',minute:'2-digit',timeZone:p.timeZone}).format(new Date());
+ return `<button class="explore-place" data-destination="${esc(p.id)}"><small>${esc(p.country)} · ${esc(localTime)} local</small><strong>${esc(p.name)} ↗</strong><span>${esc(p.description)}</span></button>`;
+ }).join('')}</div><p class="explore-note">Actual observations, with source timestamps. Transit can be quiet overnight; some feeds may be unavailable. You can also pan anywhere for global layers.</p>`;
+ $('close-explorer').onclick=()=>dialog.close();
+ dialog.querySelectorAll('[data-destination]').forEach(b=>b.onclick=()=>visitDestination(places.find(p=>p.id===b.dataset.destination)));
+ $('surprise-place').onclick=()=>{const candidates=places.filter(p=>p.id!==lastDestination);visitDestination(candidates[Math.floor(Math.random()*candidates.length)])};
+ dialog.showModal();
+}
