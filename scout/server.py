@@ -13,7 +13,9 @@ import world
 import transit
 import gbfs
 import metro
+import finnish_ships
 ADAPTERS.update(SEATTLE_ADAPTERS)
+ADAPTERS['fi-ships']=finnish_ships.snapshot
 ADAPTERS.update({'sea-ships':lambda:ships.snapshot('seattle'),'bay-ships':lambda:ships.snapshot('bay')})
 
 ROOT = Path(__file__).resolve().parent

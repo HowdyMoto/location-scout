@@ -35,6 +35,10 @@ The default **Everything** view includes moving vehicles and all other available
 
 LA Metro bus and rail positions use the agency’s public WebSocket service. Each agency has one server-side connection shared across viewers. The browser refreshes its snapshot every five seconds; actual GPS observation timestamps determine freshness and motion. Connections stop after two minutes without snapshot requests and reconnect with backoff after interruption. The existing 90-second observation playback remains in effect.
 
+### Public Finnish vessel stream
+
+The Gulf of Finland shortcut connects the public Fintraffic / Digitraffic AIS stream without an access key. Ship markers, trails and **Follow ship** use received position reports. Coverage follows the Finnish receiver network, with fresh vessels also visible along other Finnish coastal areas. One MQTT-over-TLS connection is shared across viewers and closes after two minutes without requests. Fintraffic attribution and the CC BY 4.0 license link appear on the map.
+
 ### Optional vessel feeds
 
 Neither vessel credential was configured during implementation; both adapters are implemented and fixture-tested, but their authenticated network paths remain unverified.

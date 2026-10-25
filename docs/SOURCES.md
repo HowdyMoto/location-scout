@@ -216,3 +216,13 @@ Official API: https://api.metro.net/. WebSocket documentation: https://lacmta.gi
 Live checks received approximately 1,135 fresh bus positions and 119 fresh rail positions, with both streams connected. Counts vary by service. Unit checks cover timestamp validation, geographic limits, out-of-order messages, shared connections and idle demand expiry. Strætó Iceland's official documentation was also reviewed, but real-time access requires an application, so it was not connected.
 
 A 20-second comparison through Scout's API found 859 buses and 64 rail vehicles with newer timestamps and changed coordinates. After the playback buffer filled, the browser displayed 606 moving vehicles in the LA view; following a Metro Route 460 bus confirmed its detail state was moving between timestamped observations.
+
+### Public Finnish coastal AIS
+
+Official marine API documentation: https://www.digitraffic.fi/en/marine-traffic/. The implemented public transport is MQTT over TLS WebSockets at `wss://meri.digitraffic.fi:443/mqtt`, using the documented `vessels-v2/+/location` and metadata topics. The separate REST endpoint returned HTTP 406 during the probe; the documented MQTT service accepted the connection and delivered fresh position messages.
+
+`scout/finnish_ships.py` uses Paho MQTT 2.x, one shared connection, a two-minute idle lease, automatic reconnect delay from 2 to 60 seconds, and bounded caches (5,000 position records / 10,000 vessel names). Position `time` is epoch seconds as documented; metadata timestamps are not substituted. Invalid coordinates, future/missing timestamps, old reports and AIS unavailable heading/speed sentinels are handled explicitly. Out-of-order messages cannot replace newer locations. Stationary ships remain stationary; interpolation uses only actual received reports. The browser refreshes snapshots every five seconds.
+
+Source: Fintraffic / Digitraffic. License and attribution requirements: https://www.digitraffic.fi/en/terms-of-service/ and https://creativecommons.org/licenses/by/4.0/. The map credits the provider and license and labels the data as filtered/interpolated. Reception coverage is incomplete and is not worldwide AIS. Initial direct-stream verification received 304 fresh vessels within a short sample. `Follow ship` is available alongside flight and transit following.
+
+The integrated API comparison showed 350 fresh vessels and 245 matching vessels changing coordinates over 25 seconds. The browser rendered ship markers and verified Follow ship on a vessel reporting 6.3 knots with a moving playback state. Later snapshots exceeded 400 fresh reports as the stream accumulated coverage.

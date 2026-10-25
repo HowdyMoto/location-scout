@@ -1562,5 +1562,39 @@
     "access": "integrated",
     "motion": true,
     "areaName": "Los Angeles"
+  },
+  {
+    "id": "fi-ships",
+    "name": "Finnish coastal ship traffic",
+    "source": "Fintraffic / Digitraffic",
+    "region": "fi-ships",
+    "url": "https://www.digitraffic.fi/en/marine-traffic/",
+    "bounds": [
+      16,
+      57,
+      32,
+      67
+    ],
+    "destination": {
+      "name": "Gulf of Finland",
+      "center": [
+        59.85,
+        24.8
+      ],
+      "zoom": 10,
+      "country": "Finland / Baltic Sea",
+      "timeZone": "Europe/Helsinki"
+    },
+    "icon": "▰",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 5,
+    "maxAge": 300,
+    "coverage": "Finnish AIS receiver network; reception varies",
+    "notes": "Fintraffic / Digitraffic, CC BY 4.0. Public AIS location stream. Reports older than five minutes are omitted. Reception is incomplete; absence of a marker does not imply empty water.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
   }
 ]

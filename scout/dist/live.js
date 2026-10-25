@@ -136,7 +136,7 @@ function animationFrame(now){
  }
 }
 $('pause-motion').onclick=()=>{pausedAt=pausedAt?null:Date.now();pausedSamples.clear();if(pausedAt){for(const l of layers)for(const [id,m] of l.vehicles||[])if(m.playback)pausedSamples.set(l.id+':'+id,m.playback)}$('pause-motion').textContent=pausedAt?'▶ Resume':'Ⅱ Pause';$('pause-motion').setAttribute('aria-label',pausedAt?'Resume motion playback':'Pause motion playback')};
-$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
+$('follow-ship').onclick=()=>chooseFollow('ship');$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
 map.on('dragstart',stopFollowing);
 $('radar-toggle').onclick=()=>{const l=layers.find(l=>l.id.endsWith('radar'));if(!l)return;l.on=!l.on;controls();sync();$('radar-toggle').classList.toggle('active',l.on);$('radar-status').hidden=!l.on;drawRadar(l)};
 $('radar-pause').onclick=()=>{radarPlaying=!radarPlaying;$('radar-pause').textContent=radarPlaying?'Pause radar':'Play radar'};
