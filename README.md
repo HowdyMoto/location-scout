@@ -13,7 +13,7 @@ Explore public geographic data by **panning and zooming anywhere**. **Everything
 
 During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The worldwide aircraft layer now uses adsb.fi, verified around London, Singapore and Cape Town. Its public API is personal/noncommercial; public commercial deployment requires suitable access. No replacement positions are invented.
 
-Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro and Bordeaux, plus Boston and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
+Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux and Renfe commuter trains across Spain, plus Boston and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
 
 ## Live motion experience
 

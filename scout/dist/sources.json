@@ -1353,5 +1353,42 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true
+  },
+  {
+    "id": "renfe-vehicles",
+    "name": "Renfe commuter trains",
+    "source": "Renfe Cercanías",
+    "endpoint": "https://gtfsrt.renfe.com/vehicle_positions.pb",
+    "url": "https://data.renfe.com/dataset/ubicacion-vehiculos",
+    "bounds": [
+      -9.5,
+      35.8,
+      3.5,
+      43.9
+    ],
+    "destination": {
+      "name": "Madrid",
+      "center": [
+        40.42,
+        -3.7
+      ],
+      "zoom": 11,
+      "country": "Spain",
+      "timeZone": "Europe/Madrid"
+    },
+    "adapter": "gtfs-rt",
+    "region": "renfe-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Renfe Cercanías services in Spain; reported vehicles only",
+    "notes": "Renfe open data, CC BY 4.0. Actual timestamped commuter-train GPS reports, published every 20 seconds. Coverage varies by service. Positions older than five minutes are omitted.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true,
+    "areaName": "Spain"
   }
 ]
