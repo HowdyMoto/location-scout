@@ -280,3 +280,14 @@ Only ISS ID 25544, kilometer units, finite coordinates, and provider timestamps 
 Tests cover stale/future/missing timestamps, wrong satellite/units, invalid coordinates, optional metadata, satellite-speed interpolation, unchanged aircraft/ground rejection and holding after the last received sample.
 
 Live verification returned an ISS estimate less than a second from the request time. Integrated samples changed from approximately 49.86° S, 60.70° W to 50.93° S, 54.14° W over 70 provider seconds, with six history samples accumulated. Browser Follow ISS centered the South Atlantic at continental zoom, rendered the model-labeled marker, and showed moving playback after the buffer filled, with no console errors. The radar independently reported an unavailable frame and retained its previous frame during this view.
+
+
+### NASA EONET worldwide natural events
+
+API documentation: https://eonet.gsfc.nasa.gov/docs/v3 . Fixed request: https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=30 . EONET curates dated event locations from contributing sources; its scope and limitations are described at https://eonet.gsfc.nasa.gov/what-is-eonet . Open status is the provider's classification, not confirmation of present danger, and metadata may only identify a reporting day.
+
+Scout shares one global response per 15 minutes across map views. It selects the newest dated geometry, supports Point reports, rejects closed events, future/old dates and invalid coordinates, and preserves provider dates. It does not fall back to an older point when the latest geometry is unsupported. The map includes an explicit partial-response note for omissions. Date-line-aware viewport filtering uses the same world adapter as earthquakes and buoys. Source record URLs are generated from validated EONET identifiers.
+
+Live verification returned 47 recent open events (34 wildfires, three severe storms and ten sea/lake-ice events). The integrated endpoint retained 46 latest valid points and reported one omitted event. A Pacific date-line view returned zero matching reports without borrowing records from other areas. Fixture tests cover newest-geometry selection, timestamp preservation, old/future/invalid/closed reports, polygon handling and shared fetches across views.
+
+Browser verification activated the layer from a coordinate search near a dated storm report, showed its original report time separately from fetch time, and exposed the correct NASA event-record link. The detail remained open while zooming out; no console errors were reported.

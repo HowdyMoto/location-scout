@@ -1,13 +1,13 @@
 # Location Scout — Explore the live world
 
-Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus eight viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
+Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus nine viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
 
 The map opens in **World view**. Green destination markers reveal connected cities and sky views; nearby destinations share a clickable menu. Select one to jump into its feeds, or pan and zoom anywhere. The World view button returns to the overview. These destinations indicate available integrations, not guaranteed current activity.
 
 ## Automatic geographic coverage
 
 - Moving or searching to SF immediately selects its city feeds; moving to Seattle selects its transit and dispatch feeds. A wide view can include both regions simultaneously.
-- **Worldwide:** aircraft reception where available, USGS earthquakes, NDBC buoy/coastal reports where stations exist, RainViewer radar mosaics where contributing networks provide coverage, and nine weather / air-quality model samples across each view. These are not claims of complete global receiver, sensor or city-data coverage.
+- **Worldwide:** aircraft reception where available, USGS earthquakes, NASA EONET natural-event reports, NDBC buoy/coastal reports where stations exist, RainViewer radar mosaics where contributing networks provide coverage, and nine weather / air-quality model samples across each view. These are not claims of complete global receiver, sensor or city-data coverage.
 - **Contiguous US:** USGS water gauges and NIFC wildfire reports. Detailed gauge / fire queries ask for a closer zoom on very wide views. Aircraft queries are bounded to the provider's 250-nautical-mile maximum radius.
 - **Local coverage:** transit, dispatch, cameras, parking, outages/access candidates and other city feeds retain their actual provider coverage. New cities do not automatically gain local transit or dispatch integrations.
 - Viewport requests use validated bounding boxes, padded query areas, cancellation of obsolete browser requests, per-provider caches (24 areas each), shared global-feed caching and provider-wide rate-limit backoff. Late responses cannot overwrite a newer viewport. Longitude wrapping and date-line crossings are handled explicitly.
@@ -145,3 +145,8 @@ All 18 Bay Area sources and 19 public Seattle sources returned successful respon
 Map © OpenStreetMap contributors. Aircraft data © adsb.lol contributors, ODbL. CAMS / Open-Meteo model data requires CC BY 4.0 attribution; the free Open-Meteo API is for noncommercial use. Lyft Bike data and BART data have their own provider terms. Each source's documentation is linked in the catalog; data accessibility is not a blanket redistribution license. This prototype is intended for local exploration and needs an appropriate hosting/rate-limit/licensing plan before a public production deployment.
 
 Dispatch records are reported calls, not verified crimes or confirmation of an ongoing emergency. Model estimates, planned closures, preliminary gauges, and agency wildfire reports must not be treated as emergency instructions.
+
+
+### Worldwide natural-event reports
+
+NASA EONET adds recent open wildfire, storm, sea-ice and other reported natural events. Scout uses the latest dated point for each event and a shared 15-minute refresh, then filters it to the map view. These are curated reports with approximate dates and positions, not live tracking or emergency alerts. Records older than a day are marked stale. Unsupported geometry and reports older than 30 days are omitted with a partial-coverage notice. Event details link directly to the NASA source record.

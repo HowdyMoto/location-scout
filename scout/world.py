@@ -7,10 +7,11 @@ from email.utils import parsedate_to_datetime
 from collections import OrderedDict
 import feeds as f
 import radar
+import events
 
 GLOBE=(-180,-90,180,90)
 US=(-125,24,-66,50)
-KINDS={'air':30,'quake':300,'buoys':600,'weather':900,'airquality':3600,'radar':300,'rivers':900,'wildfire':900}
+KINDS={'events':900,'air':30,'quake':300,'buoys':600,'weather':900,'airquality':3600,'radar':300,'rivers':900,'wildfire':900}
 LOCKS={k:threading.Lock() for k in KINDS}
 CACHE={k:OrderedDict() for k in KINDS}
 SHARED={}
@@ -67,8 +68,8 @@ def history(items):
 
 def fetch_view(kind,b):
     global LAST_AIR_REQUEST
-    if kind in {'quake','buoys'}:
-        value=shared(kind,lambda:f.quakes(GLOBE) if kind=='quake' else f.buoys(GLOBE))
+    if kind in {'quake','buoys','events'}:
+        value=shared(kind,lambda:events.load() if kind=='events' else f.quakes(GLOBE) if kind=='quake' else f.buoys(GLOBE))
         return {**value,'items':[i for i in value['items'] if contains(b,i['lat'],i['lon'])]}
     if kind=='radar':
         return shared(kind,radar.load)

@@ -1693,5 +1693,23 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true
+  },
+  {
+    "id": "world-events",
+    "name": "Global natural events",
+    "source": "NASA EONET / contributing sources",
+    "url": "https://eonet.gsfc.nasa.gov/docs/v3",
+    "region": "world",
+    "viewport": true,
+    "icon": "◈",
+    "color": "#bc785b",
+    "group": "Earth",
+    "kind": "Reported",
+    "refresh": 900,
+    "maxAge": 86400,
+    "coverage": "Worldwide; recent open events returned for the past 30 days",
+    "notes": "Dated wildfire, storm, sea-ice and other natural-event reports curated by NASA EONET. Latest point per event; approximate positions and dates. Not live tracking or emergency guidance. Older records keep their timestamps and are marked stale after one day.",
+    "defaultOn": true,
+    "access": "integrated"
   }
 ]
