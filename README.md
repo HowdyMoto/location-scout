@@ -15,7 +15,7 @@ The map opens in **World view**. Green destination markers reveal connected citi
 
 During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The worldwide aircraft layer now uses adsb.fi, verified around London, Singapore and Cape Town. Its public API is personal/noncommercial; public commercial deployment requires suitable access. No replacement positions are invented.
 
-Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux and Renfe commuter trains across Spain, plus Boston, Los Angeles and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
+Connected international transit includes Helsinki, participating Norwegian operators, Adelaide, Rio de Janeiro, Bordeaux, the Netherlands and Renfe commuter trains across Spain, plus Boston, Los Angeles and the Seattle agencies. The world explorer includes city and airport shortcuts, local times and a Surprise me button. Feed freshness and service hours determine whether vehicles are present.
 
 International bike availability is connected in Tokyo, Toronto and Buenos Aires. Zoom in for station bike counts; availability changes pulse on newer reports. These are changing inventories, not moving rider positions.
 
@@ -24,7 +24,7 @@ International bike availability is connected in Tokyo, Toronto and Buenos Aires.
 The default **Everything** view includes moving vehicles and all other available layers. **Live now** narrows the view to motion and live safety feeds. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
 
 - Directional aircraft, transit and vessel markers persist across updates. No extrapolation: missing reports hold their last position; long gaps and implausible jumps are not animated. Expired reports disappear.
-- **Follow a flight / Follow transit**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
+- **Follow a flight / Follow transit / Follow ship**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
 - **Pause** freezes displayed vehicle positions while data continues arriving. Resume returns to buffered playback. Reduced-motion preferences start playback paused.
 - Fading trails connect observed points, not road or rail geometry. Tracks are individually visible at zoom 10+, with clusters when zoomed further out.
 - **Radar loop** cycles up to 13 recent RainViewer mosaics worldwide. Times identify mosaic generation, not the age of every contributing radar. Native resolution is capped at zoom 7; blank areas can indicate missing coverage. New tiles load before replacing the previous frame; failed or timed-out frames retain the last successful frame and playback retries after five seconds. Public provider access is intended for personal/educational use.

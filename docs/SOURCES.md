@@ -232,3 +232,16 @@ The integrated API comparison showed 350 fresh vessels and 245 matching vessels 
 Date-line crossings now interpolate longitude along the short arc instead of traveling through Greenwich. Trails unwrap each adjacent point into the same displayed world, and vehicle following uses the closest longitude copy. Deterministic tests cover eastbound and westbound crossings, impossible-speed rejection and trail continuity around 0, ±180 and 540 degrees. These are fixture tests; they do not claim a live aircraft crossing was observed.
 
 Live API checks returned nine timestamped weather-model samples in views across Africa, Asia, Europe, North America, South America and Oceania. A browser search near Fiji at longitude 179.9 automatically loaded global layers without a region selection and showed model points on both sides of the date line without console errors. The sampled aircraft viewport was empty; no vehicle positions were fabricated.
+
+
+### Netherlands transit — OVapi / Stichting OpenGeo
+
+Provider directory: https://gtfs.ovapi.nl/nl/ . Feed: https://gtfs.ovapi.nl/nl/vehiclePositions.pb . Usage and license: https://gtfs.ovapi.nl/README . This is the provider's best-effort conversion of open Dutch transit data, not an agency affiliation or service-level guarantee. Coverage includes reporting vehicles across the Netherlands; do not infer every train has GPS coverage.
+
+The layer activates automatically from its Netherlands footprint and adds Amsterdam to world discovery. It requests one shared snapshot per minute with an identifying project User-Agent and Accept-Encoding: gzip, following the provider's usage policy. Both compressed and decoded payloads are bounded to 10 MB. The adapter also accepts uncompressed protobuf. Only timestamped positions within five minutes and the configured coverage bounds are shown; the existing 90-second observation playback applies.
+
+Initial direct verification found 1,718 fresh reports, and the integrated endpoint returned 1,660 fresh vehicles. All eight catalog-driven GTFS providers returned fresh positions after the shared gzip transport change. Deterministic tests cover both HTTP encodings and reject excessive decompressed payloads. A coordinate search into Amsterdam activated the feed without selecting a region.
+
+Malaysia's documented official feeds were rechecked during local overnight hours: KTMB, Rapid KL and Penang were empty, while MRT feeder, Johor and Kuching samples were stale. They remain candidates rather than verified live integrations. Official endpoint documentation: https://developer.data.gov.my/realtime-api/gtfs-realtime .
+
+A consecutive integrated snapshot contained 1,654 fresh reports; 1,423 matching vehicles changed coordinates with newer timestamps. Browser playback showed 322 moving objects in the Amsterdam view and successfully followed a Dutch transit vehicle with a moving state. No console errors were reported in this check.

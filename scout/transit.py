@@ -1,5 +1,7 @@
 """Catalog-driven, timestamped GTFS Realtime vehicle positions worldwide."""
 import time
+import gzip
+import io
 import urllib.request
 from google.transit import gtfs_realtime_pb2
 import feeds as f
@@ -39,9 +41,16 @@ def parse(raw, source):
 
 def load(source):
     request = urllib.request.Request(source['endpoint'], headers={
-        'User-Agent': f.USER_AGENT, 'ET-Client-Name': 'howdymoto-scout'})
+        'User-Agent': f.USER_AGENT, 'ET-Client-Name': 'howdymoto-scout',
+        'Accept-Encoding': 'gzip'})
     with urllib.request.urlopen(request, timeout=20) as response:
         raw = response.read(10_000_001)
+        compressed = response.headers.get('Content-Encoding', '').lower() == 'gzip'
     if len(raw) > 10_000_000:
         raise ValueError('Vehicle feed exceeds size limit')
+    if compressed:
+        with gzip.GzipFile(fileobj=io.BytesIO(raw)) as stream:
+            raw = stream.read(10_000_001)
+        if len(raw) > 10_000_000:
+            raise ValueError('Decoded vehicle feed exceeds size limit')
     return parse(raw, source)

@@ -1596,5 +1596,42 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true
+  },
+  {
+    "id": "nl-vehicles",
+    "name": "Netherlands live transit",
+    "source": "OVapi / Stichting OpenGeo",
+    "endpoint": "https://gtfs.ovapi.nl/nl/vehiclePositions.pb",
+    "url": "https://gtfs.ovapi.nl/README",
+    "bounds": [
+      3.2,
+      50.7,
+      7.3,
+      53.7
+    ],
+    "destination": {
+      "name": "Amsterdam",
+      "center": [
+        52.37,
+        4.9
+      ],
+      "zoom": 12,
+      "country": "Netherlands",
+      "timeZone": "Europe/Amsterdam"
+    },
+    "areaName": "Netherlands",
+    "adapter": "gtfs-rt",
+    "region": "nl-vehicles",
+    "icon": "▣",
+    "color": "#438f93",
+    "group": "Motion",
+    "kind": "Live",
+    "refresh": 60,
+    "maxAge": 300,
+    "coverage": "Netherlands; participating operators and reporting vehicles only",
+    "notes": "Open transit data converted by OVapi / Stichting OpenGeo. Best-effort service, no SLA or agency affiliation. Timestamped reported positions; records older than five minutes omitted. Refreshes once a minute. Coverage is incomplete and does not imply live GPS for every train.",
+    "defaultOn": true,
+    "access": "integrated",
+    "motion": true
   }
 ]
