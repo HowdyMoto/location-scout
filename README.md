@@ -1,6 +1,6 @@
 # Location Scout — Explore the live world
 
-Explore public geographic data by **panning and zooming anywhere**. **Everything is enabled by default.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus nine viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
+Explore public geographic data by **panning and zooming anywhere**. **All layers are enabled by default, with SF parking-enforcement and citation calls hidden.** The map automatically selects feeds whose coverage intersects the view, with detailed city sources in Seattle / Puget Sound and the SF Bay Area, international transit feeds, plus nine viewport-driven source types. Place shortcuts move the camera; they do not lock data to a region.
 
 The map opens in **World view**. Green destination markers reveal connected cities and sky views; nearby destinations share a clickable menu. Select one to jump into its feeds, or pan and zoom anywhere. The World view button returns to the overview. These destinations indicate available integrations, not guaranteed current activity.
 
@@ -11,7 +11,7 @@ The map opens in **World view**. Green destination markers reveal connected citi
 - **Contiguous US:** USGS water gauges and NIFC wildfire reports. Detailed gauge / fire queries ask for a closer zoom on very wide views. Aircraft queries are bounded to the provider's 250-nautical-mile maximum radius.
 - **Local coverage:** transit, dispatch, cameras, parking, outages/access candidates and other city feeds retain their actual provider coverage. New cities do not automatically gain local transit or dispatch integrations.
 - Viewport requests use validated bounding boxes, padded query areas, cancellation of obsolete browser requests, per-provider caches (24 areas each), shared global-feed caching and provider-wide rate-limit backoff. Late responses cannot overwrite a newer viewport. Longitude wrapping and date-line crossings are handled explicitly.
-- Layer preferences persist while exploring; **Everything** and **Reset** enable all available layers. Other presets remain optional. Search, geolocation and saved views use the same automatic coverage behavior.
+- Layer preferences persist while exploring. SF parking-enforcement/citation calls have a separate toggle and are hidden by default. **Everything** explicitly includes them; **Reset** restores all layers with those calls hidden. Saved views retain this preference. Other presets remain optional. Search, geolocation and saved views use the same automatic coverage behavior.
 
 During October 25 verification, moving the map to SF activated its sources without touching a region selector. Live London weather, Tokyo air-quality model samples and date-line earthquake queries succeeded. The worldwide aircraft layer now uses adsb.fi, verified around London, Singapore and Cape Town. Its public API is personal/noncommercial; public commercial deployment requires suitable access. No replacement positions are invented.
 

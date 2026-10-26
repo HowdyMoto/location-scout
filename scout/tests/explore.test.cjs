@@ -26,3 +26,10 @@ test('nearby discovery markers cluster across arbitrary grid boundaries',()=>{
  const places=[{id:'west',center:[149,64]},{id:'east',center:[151,66]}];
  assert.equal(E.discoveryBuckets(places,p=>({x:p[0],y:p[1]})).length,1);
 });
+
+test('parking and citation filtering is confined to explicit SF call types',()=>{
+ for(const title of ['Parking Enforcement',' PARKING ENFORCEMENT ','Parking Citation','Traffic Citations'])assert.ok(E.isCitation({id:'police'},{title}));
+ for(const title of ['Traffic Collision','Petty Theft','Medical Incident','Suspicious Person',''])assert.ok(!E.isCitation({id:'police'},{title}));
+ assert.ok(!E.isCitation({id:'sea-police'},{title:'Parking Enforcement'}));
+ assert.ok(!E.isCitation({id:'civic'},{title:'Parking Enforcement'}));
+});

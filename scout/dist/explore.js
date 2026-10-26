@@ -9,6 +9,9 @@
  function contains(a,b){return segments(b).every(y=>segments(a).some(x=>x[0]<=y[0]&&x[2]>=y[2]&&x[1]<=y[1]&&x[3]>=y[3]))}
  function queryBounds(b){const span=b[2]>b[0]?b[2]-b[0]:360+b[2]-b[0];const step=span>30?5:span>6?1:.25;const w=Math.floor(b[0]/step)*step-step,e=Math.ceil((b[0]+span)/step)*step+step;return normalize(w,Math.floor(b[1]/step)*step-step,e,Math.ceil(b[3]/step)*step+step)}
  function applies(source,b){if(source.coverageBounds)return source.coverageBounds.some(bounds=>intersects(b,bounds));if(source.bounds)return intersects(b,source.bounds);if(source.region==='world')return !['world-rivers','world-wildfire'].includes(source.id)||intersects(b,us);return Boolean(regions[source.region]&&intersects(b,regions[source.region]))}
+ function isCitation(source,item){
+  return source.id==='police'&&/^(parking enforcement|parking citations?|traffic citations?)$/i.test(String(item.title||'').trim());
+ }
  function discoveryBuckets(places,project){
   const buckets=[];
   for(const place of places){
@@ -18,6 +21,6 @@
   }
   return buckets.map(b=>b.places);
  }
- const api={regions,us,wrap,normalize,segments,intersects,contains,queryBounds,applies,discoveryBuckets};
+ const api={regions,us,wrap,normalize,segments,intersects,contains,queryBounds,applies,discoveryBuckets,isCitation};
  if(typeof module!=='undefined')module.exports=api;else root.ScoutExplore=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
