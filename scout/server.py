@@ -3,8 +3,10 @@ import argparse
 import json
 import threading
 import time
+import webbrowser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from startup import bind_server
 from urllib.parse import urlsplit, parse_qs
 from feeds import ADAPTERS
 from seattle import ADAPTERS as SEATTLE_ADAPTERS
@@ -105,9 +107,14 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--port',type=int,default=5281)
+    parser.add_argument('--auto-port',action='store_true',help='Try nearby ports if the requested port is unavailable')
+    parser.add_argument('--open-browser',action='store_true',help='Open the actual server URL in your browser')
     args=parser.parse_args()
-    server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
-    print(f'Scout: http://127.0.0.1:{args.port}',flush=True)
+    try:server=bind_server(Handler,args.port,args.auto_port)
+    except (OSError,ValueError) as exc:parser.exit(1,f'{exc}\n')
+    url=f'http://127.0.0.1:{server.server_port}'
+    print(f'Scout: {url} (Ctrl+C to stop)',flush=True)
+    if args.open_browser:webbrowser.open(url)
     try:server.serve_forever()
     except KeyboardInterrupt:pass
     finally:

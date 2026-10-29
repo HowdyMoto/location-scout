@@ -52,6 +52,30 @@ Set `WSDOT_API_KEY` for Washington State Ferries and `AISSTREAM_API_KEY` for [AI
 
 ## Run
 
+Quick start: the launchers create `.venv` if needed, install missing Python dependencies, and start the server. They try up to 20 nearby ports if the requested port is occupied, print the actual URL, and open it in your browser. No npm installation or environment activation is needed.
+
+Windows PowerShell:
+
+```powershell
+.\start.ps1
+# Optional custom port:
+.\start.ps1 -Port 5282
+```
+
+If Windows blocks script execution, use `powershell -ExecutionPolicy Bypass -File .\start.ps1` for this invocation only.
+
+macOS / Linux (Bash):
+
+```bash
+bash start.sh
+# Optional custom port:
+bash start.sh --port 5282
+```
+
+Use the **http://127.0.0.1:PORT** URL printed in the terminal, which may differ from 5281 if another server is already running. Avoid an old bookmark or `python -m http.server`: a static server can display the map but cannot provide live data. Keep the terminal open; **Ctrl+C** stops the server. Both scripts resolve paths relative to their own location, so they can also be called from another directory. Python 3.10+ must be installed; the first run needs internet access to download dependencies. Live feeds also require internet access.
+
+### Manual setup
+
 Requires Python 3.10+ and an internet connection. Use the backend below; `python -m http.server` cannot serve the data adapters.
 
 ```sh
