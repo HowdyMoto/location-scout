@@ -8,10 +8,13 @@ from collections import OrderedDict
 import feeds as f
 import radar
 import events
+import fields
+import ships
+import weather_frames
 
 GLOBE=(-180,-90,180,90)
 US=(-125,24,-66,50)
-KINDS={'events':900,'air':30,'quake':300,'buoys':600,'weather':900,'airquality':3600,'radar':300,'rivers':900,'wildfire':900}
+KINDS={'clouds':600,'lightning':600,'wind':900,'traffic':300,'ships':5,'events':900,'air':30,'quake':300,'buoys':600,'weather':900,'airquality':3600,'radar':300,'rivers':900,'wildfire':900}
 LOCKS={k:threading.Lock() for k in KINDS}
 CACHE={k:OrderedDict() for k in KINDS}
 SHARED={}
@@ -59,7 +62,7 @@ def history(items):
         if not t or not now-600000<t<=now+60000:continue
         track=TRACKS.setdefault(i['id'],[])
         if not track or t>track[-1]['time']:track.append({k:i[k] for k in ('lat','lon','time','heading') if k in i})
-        TRACKS[i['id']]=[p for p in track if p['time']>now-600000][-40:]
+        TRACKS[i['id']]=[p for p in track if p['time']>now-600000][-600:]
     for key in list(TRACKS):
         if not TRACKS[key] or TRACKS[key][-1]['time']<now-300000:del TRACKS[key]
     if len(TRACKS)>5000:
@@ -68,6 +71,13 @@ def history(items):
 
 def fetch_view(kind,b):
     global LAST_AIR_REQUEST
+    if kind=='wind':return fields.wind(b)
+    if kind in weather_frames.LAYERS:return shared(kind,lambda:weather_frames.load(kind))
+    if kind=='traffic':return fields.traffic(b)
+    if kind=='ships':
+        value=ships.snapshot_view(b)
+        value['history']=history(value['items'])
+        return value
     if kind in {'quake','buoys','events'}:
         value=shared(kind,lambda:events.load() if kind=='events' else f.quakes(GLOBE) if kind=='quake' else f.buoys(GLOBE))
         return {**value,'items':[i for i in value['items'] if contains(b,i['lat'],i['lon'])]}

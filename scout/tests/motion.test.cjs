@@ -77,3 +77,24 @@ test('orbital playback accepts satellite speeds without weakening aircraft or gr
  assert.equal(M.sample(points,t+7500,M.maxSpeed({id:'bus'})).state,'gap');
  assert.equal(M.sample(points,t+30000,M.maxSpeed({id:'iss-orbit'})).state,'holding');
 });
+
+test('adaptive delay follows observed cadence and delivery age with bounds',()=>{
+ const now=1000000;
+ const stream={refresh:5,trails:new Map([['a',[{time:now-11000},{time:now-6000},{time:now-1000}]]])};
+ assert.equal(M.bufferDelay(stream,now),11000);
+ assert.ok(M.bufferDelay({refresh:60},now)>=65000);
+ assert.ok(M.bufferDelay({refresh:600},now)<=180000);
+});
+test('high frequency histories retain the full playback window',()=>{
+ const now=1000000,points=Array.from({length:180},(_,n)=>({lat:0,lon:0,time:now-179000+n*1000}));
+ assert.equal(M.merge([],points,now).length,180);
+});
+test('route interpolation follows a corner and rejects mismatched trips',()=>{
+ const path=[[0,0,0],[.001,0,111],[.001,.001,222]],a={lat:0,lon:0,time:t,tripId:'trip',shapeId:'shape',routeDistance:0},b={lat:.001,lon:.001,time:t+30000,tripId:'trip',shapeId:'shape',routeDistance:222};
+ const p=M.sample([a,b],t+15000,65,{shape:path});assert.equal(p.routeMatched,true);assert.equal(p.lon,0);assert.equal(p.lat,.001);
+ assert.equal(M.sample([a,{...b,tripId:'other'}],t+15000,65,{shape:path}).routeMatched,undefined);
+ assert.equal(M.sample([a,b],t+31000,65,{shape:path}).state,'holding');
+});
+test('high-speed rail threshold does not relax bus validation',()=>{
+ assert.equal(M.maxSpeed({id:'fi-trains',maxSpeed:120}),120);assert.equal(M.maxSpeed({id:'bus'}),65);
+});

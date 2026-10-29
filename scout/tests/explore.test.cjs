@@ -6,9 +6,13 @@ test('antimeridian views and wrapped worlds normalize correctly',()=>{assert.dee
 test('padded query contains the viewport, including dateline',()=>{for(const b of [[-122.5,37.7,-122.3,37.9],[179,-5,-179,5],[-180,-85,180,85]])assert.ok(E.contains(E.queryBounds(b),b))});
 test('small movements reuse query coverage',()=>{const q=E.queryBounds([-122.5,37.7,-122.3,37.9]);assert.ok(E.contains(q,[-122.49,37.71,-122.29,37.91]))});
 test('catalog footprints activate worldwide transit and bikes without hardcoded regions',()=>{
- const sources=require('../dist/sources.json').filter(s=>['gtfs-rt','gbfs'].includes(s.adapter));
+ const sources=require('../dist/sources.json').filter(s=>['gtfs-rt','gbfs'].includes(s.adapter)&&s.destination);
  assert.ok(sources.length>=4);
  for(const s of sources){const [lat,lon]=s.destination.center;assert.ok(E.applies(s,[lon-.01,lat-.01,lon+.01,lat+.01]));assert.ok(!E.applies(s,[-122.5,37.7,-122.4,37.8]));assert.ok(E.applies(s,[-180,-85,180,85]));}
+});
+test('Bay Area GTFS vehicle feed follows SF bounds',()=>{
+ const source=require('../dist/sources.json').find(s=>s.id==='bay-transit');
+ assert.ok(E.applies(source,[-122.5,37.7,-122.4,37.8]));assert.ok(!E.applies(source,[-123,47,-122,48]));
 });
 test('Norway regional footprints do not activate over Helsinki',()=>{
  const source=require('../dist/sources.json').find(s=>s.id==='entur-vehicles');

@@ -4,34 +4,41 @@ let radarPlaying=true,radarNextAt=0;
 const BUFFER_MS=90000;
 const pausedSamples=new Map();
 const trailRenderer=L.canvas({padding:.3});
-function playbackTime(){return (pausedAt??Date.now())-BUFFER_MS}
-function positionFor(l,i,target=playbackTime()){
+function playbackTime(l){
+ const target=(pausedAt??Date.now())-(l?.playbackDelayMs??BUFFER_MS);
+ if(!l||pausedAt)return target;
+ // A rising buffer must never make a vehicle run backward.
+ l.playbackTarget=Math.max(l.playbackTarget??target,target);return l.playbackTarget;
+}
+function positionFor(l,i,target=playbackTime(l)){
  const key=l.id+':'+i.id;
  if(pausedAt&&pausedSamples.has(key))return pausedSamples.get(key);
- const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],target,ScoutMotion.maxSpeed(l));
+ const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],target,ScoutMotion.maxSpeed(l),l.shapes);
  if(pausedAt&&p)pausedSamples.set(key,p);
  return p;
 }
-function vehicleType(l){return l.id==='iss-orbit'?'satellite':l.id==='air'||l.id==='sea-air'||l.id==='world-air'?'air':l.id.includes('ferr')||l.id.includes('ships')?'ship':'transit'}
+function vehicleType(l){if(l.vehicleType)return l.vehicleType;return l.id==='iss-orbit'?'satellite':l.id==='air'||l.id==='sea-air'||l.id==='world-air'?'air':l.id.includes('ferr')||l.id.includes('ships')?'ship':'transit'}
 function vehicleSvg(type){
- const paths={satellite:'M9 8h6v10H9zM1 3h6v8H1zM17 15h6v8h-6zM6 9l4 3M14 15l4 3',air:'M12 1 14 9 22 15 22 18 14 15 14 20 17 22 17 24 12 22 7 24 7 22 10 20 10 15 2 18 2 15 10 9Z',ship:'M12 1 20 9 18 23 6 23 4 9Z',transit:'M12 1 19 8 19 22 5 22 5 8Z'};
+ const paths={balloon:'M12 2C1 2 2 15 10 18L10 23H14L14 18C22 15 23 2 12 2Z',satellite:'M9 8h6v10H9zM1 3h6v8H1zM17 15h6v8h-6zM6 9l4 3M14 15l4 3',air:'M12 1 14 9 22 15 22 18 14 15 14 20 17 22 17 24 12 22 7 24 7 22 10 20 10 15 2 18 2 15 10 9Z',ship:'M12 1 20 9 18 23 6 23 4 9Z',transit:'M12 1 19 8 19 22 5 22 5 8Z'};
  return `<svg viewBox="0 0 24 26" aria-hidden="true"><path d="${paths[type]}"/><path class="vehicle-window" d="M9 11h6v4H9z"/></svg>`;
 }
 function drawVehicles(l){
  if(!l.on)return;
+ const canvasMode=map.getZoom()<13;
+ if(l.canvasMode!==canvasMode){l.vehicleMode=false;l.canvasMode=canvasMode}
  if(!l.vehicleMode){l.groupLayer.clearLayers();l.vehicles=new Map();l.motionTrails=new Map();l.vehicleMode=true}
- const visible=map.getBounds().pad(.3),keep=new Set(),target=playbackTime();
+ const visible=map.getBounds().pad(.3),keep=new Set(),target=playbackTime(l);
  for(const i of mapped(l)){
   const p=positionFor(l,i,target);
   if(!p||(!visible.contains([p.lat,displayLon(p.lon)])&&followed?.id!==i.id))continue;
   keep.add(i.id);let marker=l.vehicles.get(i.id);
   if(!marker){
    const icon=L.divIcon({className:'vehicle-marker',html:`<div class="vehicle-shell ${vehicleType(l)}" style="--vehicle-color:${l.color}"><span class="vehicle-direction">${vehicleSvg(vehicleType(l))}</span><span class="vehicle-label"></span></div>`,iconSize:[28,28],iconAnchor:[14,14]});
-   marker=L.marker([p.lat,displayLon(p.lon)],{icon,title:i.title,zIndexOffset:vehicleType(l)==='air'?200:100}).on('click',()=>{const latest=l.items.find(x=>x.id===i.id);if(latest)details(l,latest)}).addTo(l.groupLayer);
+   marker=(canvasMode?L.circleMarker([p.lat,displayLon(p.lon)],{renderer:trailRenderer,radius:vehicleType(l)==='satellite'?5:3,color:l.color,weight:1,fillColor:l.color,fillOpacity:.85}):L.marker([p.lat,displayLon(p.lon)],{icon,title:i.title,zIndexOffset:vehicleType(l)==='air'?200:100})).on('click',()=>{const latest=l.items.find(x=>x.id===i.id);if(latest)details(l,latest)}).addTo(l.groupLayer);
    marker.bindTooltip(esc(i.title),{direction:'top',offset:[0,-15],className:'vehicle-tooltip'});l.vehicles.set(i.id,marker);
   }
   marker.record=i;marker.playback=p;marker.setTooltipContent(esc(i.title));marker.options.title=i.title;
-  const el=marker.getElement();if(el){el.setAttribute('title',i.title);el.querySelector('.vehicle-label').textContent=vehicleType(l)==='satellite'?'ISS · modeled':vehicleType(l)==='air'?i.title:(i.routeLabel||'');el.classList.toggle('show-label',vehicleType(l)==='satellite'||map.getZoom()>=13||followed?.id===i.id)}
+  const el=marker.getElement();if(el){el.setAttribute('title',i.title);el.querySelector('.vehicle-label').textContent=vehicleType(l)==='satellite'?(l.id==='iss-orbit'?'ISS · modeled':i.title):vehicleType(l)==='air'?i.title:(i.routeLabel||'');el.classList.toggle('show-label',vehicleType(l)==='satellite'||map.getZoom()>=13||followed?.id===i.id)}
  }
  for(const [id,marker] of l.vehicles)if(!keep.has(id)){l.groupLayer.removeLayer(marker);l.vehicles.delete(id);if(l.motionTrails.has(id)){l.groupLayer.removeLayer(l.motionTrails.get(id));l.motionTrails.delete(id)}}
  if(followed?.layer===l.id&&!l.vehicles.has(followed.id)){stopFollowing();toast('Tracking ended: no recent position is available.')}
@@ -53,12 +60,12 @@ function updateMotionTrails(l,target){
 }
 function stopFollowing(){followed=null;if($('follow-status'))$('follow-status').hidden=true}
 function followVehicle(l,i){
- followed={layer:l.id,id:i.id};const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),ScoutMotion.maxSpeed(l))||i;
- map.setView([p.lat,displayLon(p.lon)],vehicleType(l)==='satellite'?4:vehicleType(l)==='air'?12:15,{animate:false});
+ followed={layer:l.id,id:i.id};const p=ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(l),ScoutMotion.maxSpeed(l),l.shapes)||i;
+ map.setView([p.lat,displayLon(p.lon)],vehicleType(l)==='satellite'?4:['air','balloon'].includes(vehicleType(l))?12:15,{animate:false});
  $('follow-status').hidden=false;$('follow-name').textContent=i.title;
 }
-function chooseFollow(type){
- const candidates=layers.filter(l=>l.on&&moving(l)&&vehicleType(l)===type).flatMap(l=>mapped(l).map(i=>({l,i,p:ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(),ScoutMotion.maxSpeed(l))})));
+function chooseFollow(type,layerId){
+ const candidates=layers.filter(l=>l.on&&moving(l)&&vehicleType(l)===type&&(!layerId||l.id===layerId)).flatMap(l=>mapped(l).map(i=>({l,i,p:ScoutMotion.sample(l.trails?.get(i.id)||[i],playbackTime(l),ScoutMotion.maxSpeed(l),l.shapes)})));
  candidates.sort((a,b)=>Number(b.p?.state==='moving')-Number(a.p?.state==='moving')||Number(inView(b.i))-Number(inView(a.i)));
  const pick=candidates.find(x=>x.i.id!==followed?.id)||candidates[0];
  if(!pick)return toast('No recent vehicles of this type are available. Enable a vehicle layer.');
@@ -116,27 +123,29 @@ function advanceRadar(l){
 function animationFrame(now){
  requestAnimationFrame(animationFrame);
  if(document.hidden||now-lastFrame<33)return;lastFrame=now;
+ environmentFrame(now);
  const target=playbackTime();let inMotion=0,holding=0,buffering=0;
  for(const l of layers.filter(l=>l.on&&moving(l)&&l.vehicleMode)){
   for(const [id,marker] of l.vehicles){
-   const p=positionFor(l,marker.record,target);if(!p)continue;
+   const p=positionFor(l,marker.record,playbackTime(l));if(!p)continue;
    marker.playback=p;marker.setLatLng([p.lat,displayLon(p.lon)]);
    const el=marker.getElement();
    if(el){const h=Number.isFinite(p.heading)?p.heading:0;el.querySelector('.vehicle-direction').style.transform=`rotate(${h}deg)`;el.classList.toggle('vehicle-held',p.state==='gap'||staleItem(l,marker.record));el.classList.toggle('vehicle-followed',followed?.layer===l.id&&followed.id===id)}
    if(map.getBounds().contains([p.lat,displayLon(p.lon)])){if(p.state==='moving')inMotion++;else if(p.state==='buffering')buffering++;else holding++}
    if(followed?.layer===l.id&&followed.id===id&&now-lastFollow>250){lastFollow=now;$('follow-name').textContent=marker.record.title;map.panTo([p.lat,displayLon(p.lon)],{animate:false,noMoveStart:true})}
   }
-  if(now-lastMetrics>1000)updateMotionTrails(l,target);
+  if(now-lastMetrics>1000)updateMotionTrails(l,playbackTime(l));
  }
  if(now-lastMetrics>1000){
+  for(const l of layers.filter(l=>l.on&&l.weatherRaster))if(!pausedAt)drawWeather(l);
   lastMetrics=now;$('moving-count').textContent=pausedAt?'0':inMotion;$('holding-count').textContent=holding+buffering;$('new-count').textContent=newReports;
-  $('playback-clock').textContent=new Date(target).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  $('motion-caption').textContent=pausedAt?'Playback paused · feeds continue updating':map.getZoom()<10&&!layers.some(l=>l.on&&l.id==='iss-orbit'&&l.vehicles?.size)?'Zoom in to see individual vehicles move':inMotion?'90s behind real time · interpolated between received positions':buffering?'Buffering observations · motion starts as the 90s buffer fills':'90s observation playback · vehicles hold when no new position is available';
+  $('playback-clock').textContent=new Date(pausedAt??Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  $('motion-caption').textContent=pausedAt?'Playback paused · feeds continue updating':inMotion?'Adaptive delayed playback · dots follow received positions':buffering?'Collecting observations · playback delay adapts to each feed':'Waiting for new positions · stationary vehicles remain still';
   for(const l of layers.filter(l=>l.on&&l.id.endsWith('radar')))if(radarPlaying&&Date.now()>radarNextAt)advanceRadar(l);
  }
 }
 $('pause-motion').onclick=()=>{pausedAt=pausedAt?null:Date.now();pausedSamples.clear();if(pausedAt){for(const l of layers)for(const [id,m] of l.vehicles||[])if(m.playback)pausedSamples.set(l.id+':'+id,m.playback)}$('pause-motion').textContent=pausedAt?'▶ Resume':'Ⅱ Pause';$('pause-motion').setAttribute('aria-label',pausedAt?'Resume motion playback':'Pause motion playback')};
-$('follow-iss').onclick=()=>chooseFollow('satellite');$('follow-ship').onclick=()=>chooseFollow('ship');$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
+$('follow-iss').onclick=()=>chooseFollow('satellite','iss-orbit');$('follow-balloon').onclick=()=>chooseFollow('balloon');$('follow-satellite').onclick=()=>chooseFollow('satellite','satellites');$('follow-ship').onclick=()=>chooseFollow('ship');$('follow-flight').onclick=()=>chooseFollow('air');$('follow-transit').onclick=()=>chooseFollow('transit');$('stop-follow').onclick=stopFollowing;
 map.on('dragstart',stopFollowing);
 $('radar-toggle').onclick=()=>{const l=layers.find(l=>l.id.endsWith('radar'));if(!l)return;l.on=!l.on;controls();sync();$('radar-toggle').classList.toggle('active',l.on);$('radar-status').hidden=!l.on;drawRadar(l)};
 $('radar-pause').onclick=()=>{radarPlaying=!radarPlaying;$('radar-pause').textContent=radarPlaying?'Pause radar':'Play radar'};
@@ -144,7 +153,13 @@ if(matchMedia('(prefers-reduced-motion: reduce)').matches){pausedAt=Date.now();$
 requestAnimationFrame(animationFrame);
 boot();
 
-let lastDestination=null;
+let lastDestination=null,discoveryActivity={},discoveryLoading=false;
+async function refreshDiscovery(){
+ if(discoveryLoading||document.hidden||!(map.getZoom()<=7||$('explore-dialog')?.open))return;
+ discoveryLoading=true;
+ try{const r=await fetch('/api/discovery',{signal:AbortSignal.timeout(10000)});if(r.ok){const d=await r.json();discoveryActivity=d.destinations||{};updateExplorerActivity()}}catch{}finally{discoveryLoading=false}
+}
+setInterval(refreshDiscovery,30000);setTimeout(refreshDiscovery,1000);
 const discoveryLayer=L.layerGroup().addTo(map);
 map.on('moveend',drawDiscovery);
 function showWorld(){
@@ -182,10 +197,12 @@ function visitDestination(p){
 function destinationActivity(p){
  const center=p.center||homes[p.id]?.center;
  const sources=allLayers.filter(l=>l.id===p.id||l.region===p.id||(p.id.endsWith('-sky')&&l.id==='world-air'&&l.queryKey&&center&&ScoutExplore.contains(l.queryKey.split(',').map(Number),[center[1],center[0],center[1]+.000001,center[0]+.000001])));
- return ScoutMotion.activity(sources,center);
+ const local=ScoutMotion.activity(sources,center),remote=discoveryActivity[p.id==='seattle'?'sea-metro':p.id==='bay'?'bay-transit':p.id];
+ if(remote&&Date.now()-remote.checkedAt<180000&&(!local.checked||remote.vehicles>local.vehicles))return {...remote,discovery:true};
+ return local;
 }
 function activityLabel(a){
- if(a.vehicles)return `${a.vehicles.toLocaleString()} recent vehicles · ${a.moving.toLocaleString()} moving in playback`;
+ if(a.vehicles)return `${a.vehicles.toLocaleString()} recent vehicles · ${a.moving.toLocaleString()} ${a.discovery?'changed position':'moving in playback'}`;
  if(a.stations)return `${a.stations.toLocaleString()} stations reporting availability`;
  if(a.unavailable)return 'Feed unavailable · try another place';
  return a.checked?'No fresh local reports in the last check':'Explore coverage · activity not checked yet';
@@ -204,9 +221,9 @@ function showExplorer(){
  dialog.innerHTML=`<div class="explore-heading"><div><div class="eyebrow">FOLLOW YOUR CURIOSITY</div><h2 id="explorer-title">A different place. A different rhythm.</h2><p>Find fresh reports near each destination. Surprise me favors places with observed movement.</p></div><button id="close-explorer" aria-label="Close world explorer">×</button></div><button id="surprise-place" class="surprise-place">↗ Surprise me</button><div class="explore-grid">${places.map(p=>{
  const localTime=new Intl.DateTimeFormat([],{hour:'numeric',minute:'2-digit',timeZone:p.timeZone}).format(new Date());
  return `<button class="explore-place" data-destination="${esc(p.id)}"><small>${esc(p.country)} · ${esc(localTime)} local</small><strong>${esc(p.name)} ↗</strong><span>${esc(p.description)}</span><span class="explore-activity" data-activity="${esc(p.id)}"></span></button>`;
- }).join('')}</div><p class="explore-note">Counts cover fresh reports within 50 km of each destination, from feeds already checked. Movement uses 90-second observation playback. Unchecked or quiet places are still explorable; pan anywhere for global layers.</p>`;
+ }).join('')}</div><p class="explore-note">Counts cover fresh reports within 50 km of each destination, from shared background checks and visible feeds. Movement uses source-specific delayed observation playback. Unchecked or quiet places are still explorable; pan anywhere for global layers.</p>`;
  $('close-explorer').onclick=()=>dialog.close();
  dialog.querySelectorAll('[data-destination]').forEach(b=>b.onclick=()=>visitDestination(places.find(p=>p.id===b.dataset.destination)));
  $('surprise-place').onclick=()=>{const candidates=ScoutMotion.activeDestinations(places.map(p=>({...p,activity:destinationActivity(p)})),lastDestination);if(candidates.length)visitDestination(candidates[Math.floor(Math.random()*candidates.length)])};
- dialog.showModal();updateExplorerActivity();
+ dialog.showModal();updateExplorerActivity();refreshDiscovery();
 }

@@ -21,7 +21,7 @@ International bike availability is connected in Tokyo, Toronto and Buenos Aires.
 
 ## Live motion experience
 
-The default **Everything** view includes moving vehicles and all other available layers. **Live now** narrows the view to motion and live safety feeds. The map uses a **90-second playback buffer**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
+The default **Everything** view includes moving vehicles and all other available layers. **Live now** narrows the view to motion and live safety feeds. The map uses an **adaptive per-source playback buffer (10–180 seconds)**, interpolating between received positions. This is deliberately delayed observation playback, not a prediction or a zero-latency claim. A fresh server/browser needs observations to accumulate before motion starts. The server retains up to ten minutes of bounded history in memory, allowing subsequent clients to start with recent tracks.
 
 - Directional aircraft, transit and vessel markers persist across updates. No extrapolation: missing reports hold their last position; long gaps and implausible jumps are not animated. Expired reports disappear.
 - **Follow a flight / Follow transit / Follow ship**, or select a vehicle and follow it. Dragging the map stops following. Scene shortcuts focus on downtown, airport approaches and the water.
@@ -33,11 +33,11 @@ The default **Everything** view includes moving vehicles and all other available
 
 ### Streamed Los Angeles vehicles
 
-LA Metro bus and rail positions use the agency’s public WebSocket service. Each agency has one server-side connection shared across viewers. The browser refreshes its snapshot every five seconds; actual GPS observation timestamps determine freshness and motion. Connections stop after two minutes without snapshot requests and reconnect with backoff after interruption. The existing 90-second observation playback remains in effect.
+LA Metro bus and rail positions use the agency’s public WebSocket service. Each agency has one server-side connection shared across viewers. The browser refreshes its snapshot every five seconds; actual GPS observation timestamps determine freshness and motion. Connections stop after two minutes without snapshot requests and reconnect with backoff after interruption. Playback delay adapts to observed cadence and delivery age.
 
 ### Follow the International Space Station
 
-**Follow ISS** finds the station anywhere on the globe and follows its ground track at a continental zoom. The gold marker and source panel explicitly identify an **orbital model estimate**, not live on-board GPS. Where the ISS at? supplies timestamped positions, altitude and orbital speed. A shared ten-second fetch feeds the same 90-second buffered playback, with a satellite-specific speed limit and continuous date-line trails. No future position is extrapolated when reports stop.
+**Follow ISS** finds the station anywhere on the globe and follows its ground track at a continental zoom. The gold marker and source panel explicitly identify an **orbital model estimate**, not live on-board GPS. Where the ISS at? supplies timestamped positions, altitude and orbital speed. A shared ten-second fetch feeds adaptive buffered playback, with a satellite-specific speed limit and continuous date-line trails. No future position is extrapolated when reports stop.
 
 ### Public Finnish vessel stream
 
@@ -49,6 +49,33 @@ Neither vessel credential was configured during implementation; both adapters ar
 
 Set `WSDOT_API_KEY` for Washington State Ferries and `AISSTREAM_API_KEY` for [AISStream](https://aisstream.io/). Set these in the server process environment and restart; `.env` files are not loaded automatically. Keys never go to the browser or public repository. AIS uses one compressed server-side WebSocket for both regions, bounded in-memory storage and exponential reconnect backoff. AIS timestamps identify reception time, which may differ from the vessel's sensor observation time.
 
+
+## Expanded live motion
+
+The catalog now has 60 active integrated layers, including 27 motion-capable layers (some require credentials). Vehicles remain visible as Canvas dots at regional/world zooms, changing to detailed icons at street zooms. Interpolation uses a binary search over up to 600 samples per track. Playback delay adapts between 10 and 180 seconds; it never extrapolates observed vehicles beyond the last received position.
+
+- **New public observations:** Finnish train GPS, SondeHub weather balloons, Denver RTD vehicles, and Lisbon metropolitan buses. Train/balloon streams are shared, compressed MQTT-over-WebSocket connections and stop after two idle minutes.
+- **Modeled orbital motion:** CelesTrak science satellites and stations, propagated with SGP4. Clearly labeled estimates, not spacecraft telemetry; the existing ISS layer stays separate. Follow buttons support both satellites and balloons.
+- **Environmental animation:** a 6×6 Open-Meteo wind grid with bilinear interpolation, NOAA global infrared cloud loops, and NOAA/Vaisala 15-minute lightning-density loops. Wind particles illustrate modeled flow at exaggerated visual speed. Lightning is aggregate density, not individual flashes or a raw GOES GLM feed. Weather imagery plays at accelerated speed and retains original frame timestamps.
+- **Route-aware transit:** static GTFS shapes load in the background for MBTA, King County Metro, and Sound Transit. Matching requires the same trip/shape, GPS within 80 m of the shape, plausible speed, and forward progress. Otherwise playback retains the straight segment between observations. Route availability depends on matching provider identifiers; a shape is never guessed from a route name.
+- **Discovery:** opening the world view/explorer starts shared checks for up to 24 configured destinations, with two concurrent workers. Badges distinguish coordinate changes between checks from movement in browser playback. Checks stop after demand expires.
+- **Credential-dependent integrations:** regional 511 Bay transit, viewport-driven AISStream vessels, Washington State Ferries, and sampled TomTom road flow are wired but need keys. AIS subscriptions follow viewed coastal regions, including the date line. TomTom samples up to nine nearby road segments; its particles represent aggregate speed, not individual cars or complete road coverage.
+
+Set optional keys in the same shell before starting (see `.env.example` for names). The app does **not** automatically read `.env` files. Do not commit key values.
+
+```powershell
+$env:SF511_API_KEY = 'your-key'
+$env:AISSTREAM_API_KEY = 'your-key'
+$env:WSDOT_API_KEY = 'your-key'
+$env:TOMTOM_API_KEY = 'your-key'
+.\start.ps1
+```
+
+In Bash, use `export SF511_API_KEY='your-key'` (and equivalent variables), then `bash start.sh`. The default 511 quota is respected with a shared 65-second polling interval; credentials stay server-side.
+
+For repeatable feed research, `python scout/discover_feeds.py provider-domain --output candidates.json` searches Transitland Atlas for GTFS VehiclePosition candidates. It does not auto-enable unverified feeds. Review provider terms and measure timestamp age, changing coordinates, gaps, coverage, and cadence before adding a candidate.
+
+The expansion's timestamped API evidence is in [motion-expansion-verification.json](docs/motion-expansion-verification.json). Authenticated paths were not live-tested without keys. Browser automation was unavailable during this expansion; rendering logic was regression-tested and NOAA image responses were verified directly.
 
 ## Run
 
@@ -100,7 +127,7 @@ Open **http://127.0.0.1:5281**. Choose another port with `--port 5282`. On Windo
 
 ## Seattle / Puget Sound
 
-- **Moving vehicles:** King County Metro, Sound Transit, Community Transit, Everett Transit and Kitsap Transit GPS feeds, plus aircraft. Refresh every 30 seconds; transit reports expire after five minutes, aircraft after two. At zoom level 10+, vehicles move through buffered observations; short trails show the past three minutes (transit trails appear at zoom 12+). Lines do not represent roads or predicted travel.
+- **Moving vehicles:** King County Metro, Sound Transit, Community Transit, Everett Transit and Kitsap Transit GPS feeds, plus aircraft. Refresh every 30 seconds; transit reports expire after five minutes, aircraft after two. At regional and street zoom levels, vehicles move through buffered observations; short trails show the past three minutes (transit trails appear at zoom 12+). Lines do not represent roads or predicted travel.
 - **Safety:** Seattle fire / EMS calls from the last six hours; active NWS weather warnings; NIFC wildfire reports; seven days of earthquakes.
 - **Water and weather:** nine weather stations, five tide gauges, USGS river gauges, NDBC buoy/coastal conditions, NOAA radar and eight modeled air-quality samples.
 - **City context:** 393 active SDOT camera locations during verification, linking to the official camera viewer; delayed police call history and paid-parking snapshots, off by default. Parking is derived from payments, not live available-space sensors.

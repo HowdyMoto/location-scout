@@ -17,6 +17,9 @@ function harness() {
 }
 const layer=id=>({id,items:[],next:0,refresh:60});
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
+test('disabled layers do not keep demanding upstream snapshots',()=>{
+ const h=harness();h.setLayers([{...layer('off'),on:false}]);h.refresh();assert.equal(h.requests.length,0);
+});
 test('a completed slot immediately fetches the new region while another old request is slow',async()=>{
   const h=harness(), old=Array.from({length:4},(_,i)=>layer('bay-'+i));
   h.setLayers(old);h.refresh();assert.equal(h.requests.length,4);

@@ -1,0 +1,239 @@
+{
+  "verifiedAt": "2026-10-29T06:41:00Z",
+  "comparisonSeconds": 35,
+  "results": {
+    "fi-trains": {
+      "status": "ok",
+      "items": 141,
+      "changedPositions": 0,
+      "maxHistoryPoints": 14,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Fintraffic rail: stream connected. Original observation times retained.",
+      "error": null
+    },
+    "balloons": {
+      "status": "ok",
+      "items": 22,
+      "changedPositions": 0,
+      "maxHistoryPoints": 60,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "SondeHub balloons: stream connected. Original observation times retained.",
+      "error": null
+    },
+    "satellites": {
+      "status": "ok",
+      "items": 64,
+      "changedPositions": 64,
+      "maxHistoryPoints": 11,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Science satellites and space stations. Modeled positions; orbital elements cached six hours, rejected after 14 days.",
+      "error": null
+    },
+    "denver-vehicles": {
+      "status": "ok",
+      "items": 140,
+      "changedPositions": 95,
+      "maxHistoryPoints": 2,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Regional Transportation District. Actual reported positions; 7 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation.",
+      "error": null
+    },
+    "lisbon-vehicles": {
+      "status": "ok",
+      "items": 694,
+      "changedPositions": 658,
+      "maxHistoryPoints": 2,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Carris Metropolitana GPS; 0 old or untimestamped reports omitted.",
+      "error": null
+    },
+    "bay-transit": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": true,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Set SF511_API_KEY on the server to enable this feed.",
+      "error": null
+    },
+    "sea-ferries": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": true,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Set WSDOT_API_KEY on the server to enable actual ferry GPS positions.",
+      "error": null
+    },
+    "world-ships?bbox=-10,35,0,45": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": true,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Set AISSTREAM_API_KEY on the server to enable streamed ship positions. No vessel data is simulated.",
+      "error": null
+    },
+    "world-wind?bbox=-10,35,0,45": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": false,
+      "windVectors": 36,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Open-Meteo wind model / CC BY 4.0. Animated particles illustrate flow; they are not tracked air parcels. Visual speed is exaggerated.",
+      "error": null
+    },
+    "world-clouds?bbox=-180,-85,180,85": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 6,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "NOAA global infrared cloud imagery \u00b7 hourly frames. Coverage varies; playback is accelerated.",
+      "error": null
+    },
+    "world-lightning?bbox=-180,-85,180,85": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 12,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "NOAA / Vaisala lightning density \u00b7 15-minute aggregates, not individual flashes. Coverage varies; playback is accelerated.",
+      "error": null
+    },
+    "world-traffic?bbox=-9.3,38.6,-9,38.9": {
+      "status": "ok",
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": true,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "Set TOMTOM_API_KEY on the server for sampled road speeds.",
+      "error": null
+    },
+    "mbta-vehicles": {
+      "status": "ok",
+      "items": 6,
+      "changedPositions": 1,
+      "maxHistoryPoints": 2,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 0,
+      "note": "MBTA. Actual reported positions; 8 old or untimestamped records omitted. Coverage varies by service and time of day. No position extrapolation. Matching trips use GTFS route geometry when GPS is within 80 m; other reports retain raw positions.",
+      "error": null
+    },
+    "discovery": {
+      "status": null,
+      "items": 0,
+      "changedPositions": 0,
+      "maxHistoryPoints": 0,
+      "configurationRequired": false,
+      "windVectors": 0,
+      "weatherFrames": 0,
+      "matchedRoutes": 0,
+      "discoveryDestinations": 16,
+      "note": "Fresh reports within 50 km. Movement means changed coordinates between checks, not a prediction.",
+      "error": null
+    }
+  },
+  "followup": {
+    "sea-metro": {
+      "status": "ok",
+      "items": 166,
+      "historiesWithChangedPositions": 136,
+      "matchedRoutes": 0,
+      "matchedVehicles": 0
+    },
+    "sea-sound": {
+      "status": "ok",
+      "items": 23,
+      "historiesWithChangedPositions": 21,
+      "matchedRoutes": 5,
+      "matchedVehicles": 21
+    },
+    "fi-trains": {
+      "status": "ok",
+      "items": 143,
+      "historiesWithChangedPositions": 132,
+      "matchedRoutes": 0,
+      "matchedVehicles": 0
+    },
+    "balloons": {
+      "status": "ok",
+      "items": 23,
+      "historiesWithChangedPositions": 22,
+      "matchedRoutes": 0,
+      "matchedVehicles": 0
+    },
+    "mbta-vehicles": {
+      "status": "ok",
+      "items": 4,
+      "historiesWithChangedPositions": 1,
+      "matchedRoutes": 0,
+      "matchedVehicles": 0
+    }
+  },
+  "imageChecks": {
+    "clouds": "HTTP 200 image/png with PNG signature, browser ISO-Z timestamp format",
+    "lightning": "HTTP 200 image/png with PNG signature, browser ISO-Z timestamp format"
+  },
+  "routePlaybackCheck": {
+    "source": "Sound Transit",
+    "tracksInterpolatingOnGTFSShapes": 19
+  },
+  "limitations": [
+    "No configured SF511_API_KEY, AISSTREAM_API_KEY, WSDOT_API_KEY or TOMTOM_API_KEY; authenticated paths remain unverified.",
+    "Both browser and native UI tools failed to initialize; no visual browser QA claimed.",
+    "Lightning layer uses 15-minute density aggregates, not raw GLM flash points.",
+    "Malaysia endpoints timed out; San Diego returned HTTP 500; Springfield response was not valid protobuf. These candidates were not activated."
+  ]
+}

@@ -3,8 +3,11 @@ import time
 import gzip
 import io
 import urllib.request
+import urllib.parse
+import os
 from google.transit import gtfs_realtime_pb2
 import feeds as f
+import routes
 
 
 def parse(raw, source):
@@ -31,7 +34,8 @@ def parse(raw, source):
             f'Route ID {route}. Actual vehicle GPS report; route IDs are provider identifiers, not public route numbers.',
             int(v.timestamp)*1000, bounds=source['bounds'],
             summary=f"{source['source']} · Route ID {route}",
-            heading=v.position.bearing if v.position.HasField('bearing') else None)
+            heading=v.position.bearing if v.position.HasField('bearing') else None,
+            tripId=v.trip.trip_id,routeId=route)
         if item and (identifier not in items or item['time'] > items[identifier]['time']):
             items[identifier] = item
     return f.result(list(items.values()),
@@ -40,7 +44,12 @@ def parse(raw, source):
 
 
 def load(source):
-    request = urllib.request.Request(source['endpoint'], headers={
+    endpoint=source['endpoint']
+    if source.get('keyEnv'):
+        key=os.environ.get(source['keyEnv'])
+        if not key:return f.result([],f"Set {source['keyEnv']} on the server to enable this feed.",configurationRequired=True)
+        endpoint+=('&' if '?' in endpoint else '?')+urllib.parse.urlencode({source.get('keyParam','api_key'):key})
+    request = urllib.request.Request(endpoint, headers={
         'User-Agent': f.USER_AGENT, 'ET-Client-Name': 'howdymoto-scout',
         'Accept-Encoding': 'gzip'})
     with urllib.request.urlopen(request, timeout=20) as response:
@@ -53,4 +62,5 @@ def load(source):
             raw = stream.read(10_000_001)
         if len(raw) > 10_000_000:
             raise ValueError('Decoded vehicle feed exceeds size limit')
-    return parse(raw, source)
+    value=parse(raw, source)
+    return routes.enrich(value,source['staticGTFS']) if source.get('staticGTFS') else value

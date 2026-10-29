@@ -313,7 +313,8 @@
     "defaultOn": true,
     "icon": "⛴",
     "color": "#238c9d",
-    "coverage": "San Francisco Bay"
+    "coverage": "San Francisco Bay",
+    "supersededBy": "world-ships"
   },
   {
     "id": "airnow",
@@ -902,7 +903,8 @@
     "icon": "⛴",
     "color": "#238c9d",
     "coverage": "Seattle / Puget Sound",
-    "motion": true
+    "motion": true,
+    "supersededBy": "world-ships"
   },
   {
     "id": "sea-scooters",
@@ -1187,7 +1189,8 @@
     "notes": "Timestamped GPS observations. Coverage varies by route and service hours; stale positions are omitted.",
     "defaultOn": true,
     "access": "integrated",
-    "motion": true
+    "motion": true,
+    "staticGTFS": "https://cdn.mbta.com/MBTA_GTFS.zip"
   },
   {
     "id": "adelaide-vehicles",
@@ -1389,7 +1392,8 @@
     "defaultOn": true,
     "access": "integrated",
     "motion": true,
-    "areaName": "Spain"
+    "areaName": "Spain",
+    "maxSpeed": 120
   },
   {
     "id": "tokyo-bikes",
@@ -1711,5 +1715,283 @@
     "notes": "Dated wildfire, storm, sea-ice and other natural-event reports curated by NASA EONET. Latest point per event; approximate positions and dates. Not live tracking or emergency guidance. Older records keep their timestamps and are marked stale after one day.",
     "defaultOn": true,
     "access": "integrated"
+  },
+  {
+    "id": "fi-trains",
+    "name": "Finnish trains",
+    "source": "Fintraffic / Digitraffic",
+    "url": "https://www.digitraffic.fi/en/railway-traffic/",
+    "region": "fi-trains",
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 5,
+    "maxAge": 300,
+    "motion": true,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Only timestamped reports; unavailable or old positions are not simulated.",
+    "bounds": [
+      19,
+      59,
+      32,
+      71
+    ],
+    "maxSpeed": 120,
+    "vehicleType": "transit",
+    "attribution": "Fintraffic / Digitraffic · CC BY 4.0",
+    "destination": {
+      "name": "Finnish railway",
+      "country": "Finland",
+      "timeZone": "Europe/Helsinki",
+      "center": [
+        61.5,
+        24
+      ],
+      "zoom": 7
+    }
+  },
+  {
+    "id": "balloons",
+    "name": "Weather balloons",
+    "source": "SondeHub volunteer receiver network",
+    "url": "https://github.com/projecthorus/sondehub-infra/wiki/MQTT-Websockets",
+    "region": "balloons",
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "◎",
+    "color": "#df839e",
+    "access": "integrated",
+    "refresh": 5,
+    "maxAge": 300,
+    "motion": true,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Actual radiosonde GPS observations from the shared MQTT batch stream; no chase vehicles, receiver locations or landing predictions.",
+    "bounds": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "maxSpeed": 150,
+    "vehicleType": "balloon",
+    "attribution": "SondeHub · CC BY-SA 2.0"
+  },
+  {
+    "id": "satellites",
+    "name": "Science satellites & stations",
+    "source": "CelesTrak / SGP4",
+    "url": "https://celestrak.org/NORAD/documentation/gp-data-formats.php",
+    "region": "satellites",
+    "group": "Motion",
+    "kind": "Modeled",
+    "icon": "◎",
+    "color": "#bf9d35",
+    "access": "integrated",
+    "refresh": 10,
+    "maxAge": 300,
+    "motion": true,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Calculated orbital positions, not telemetry. Elements cached six hours and rejected after 14 days. ISS has a separate layer.",
+    "bounds": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "maxSpeed": 9000,
+    "vehicleType": "satellite",
+    "attribution": "CelesTrak orbital elements / SGP4"
+  },
+  {
+    "id": "bay-transit",
+    "name": "Bay Area transit GPS",
+    "source": "511 SF Bay",
+    "url": "https://511.org/open-data/transit",
+    "region": "bay",
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 65,
+    "maxAge": 300,
+    "motion": true,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Requires SF511_API_KEY. Shared regional snapshot every 65 seconds respects default 60 requests/hour. Actual participating-operator positions only.",
+    "bounds": [
+      -123.6,
+      36.8,
+      -121.2,
+      38.9
+    ],
+    "adapter": "gtfs-rt",
+    "endpoint": "https://api.511.org/Transit/VehiclePositions",
+    "keyEnv": "SF511_API_KEY",
+    "maxSpeed": 120
+  },
+  {
+    "id": "world-ships",
+    "name": "Ships in this region",
+    "source": "AISStream",
+    "url": "https://aisstream.io/documentation/",
+    "region": "world",
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "◎",
+    "color": "#399ebc",
+    "access": "integrated",
+    "refresh": 5,
+    "maxAge": 300,
+    "motion": true,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Requires AISSTREAM_API_KEY. Shared viewport subscriptions expire after two idle minutes. Reception timestamps, not verified sensor observation times.",
+    "viewport": true,
+    "vehicleType": "ship"
+  },
+  {
+    "id": "world-wind",
+    "name": "Wind flow",
+    "source": "Open-Meteo",
+    "url": "https://open-meteo.com/en/docs",
+    "region": "world",
+    "group": "Earth",
+    "kind": "Modeled",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 900,
+    "maxAge": 300,
+    "motion": false,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "36 model vectors with bilinear interpolation; particles illustrate wind, not tracked air parcels. Visual speed exaggerated. Open-Meteo / CC BY 4.0.",
+    "viewport": true,
+    "attribution": "Open-Meteo"
+  },
+  {
+    "id": "world-traffic",
+    "name": "Road flow samples",
+    "source": "TomTom",
+    "url": "https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/traffic-flow/flow-segment-data",
+    "region": "world",
+    "group": "Roads",
+    "kind": "Live",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 300,
+    "maxAge": 300,
+    "motion": false,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Requires TOMTOM_API_KEY. Up to nine sampled road segments, not all roads. Particles represent aggregate flow, not cars. Times are fetch times.",
+    "viewport": true,
+    "attribution": "TomTom"
+  },
+  {
+    "id": "world-clouds",
+    "name": "Satellite cloud loop",
+    "source": "NOAA nowCOAST",
+    "url": "https://nowcoast.noaa.gov/",
+    "region": "world",
+    "group": "Earth",
+    "kind": "Observed",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 600,
+    "maxAge": 300,
+    "motion": false,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Accelerated loop of recent global infrared mosaics. Hourly observed frames; coverage varies.",
+    "viewport": true,
+    "attribution": "NOAA nowCOAST"
+  },
+  {
+    "id": "world-lightning",
+    "name": "Lightning density loop",
+    "source": "NOAA nowCOAST / Vaisala",
+    "url": "https://nowcoast.noaa.gov/",
+    "region": "world",
+    "group": "Earth",
+    "kind": "Observed",
+    "icon": "◎",
+    "color": "#45a8a0",
+    "access": "integrated",
+    "refresh": 600,
+    "maxAge": 300,
+    "motion": false,
+    "coverage": "Provider reception coverage varies.",
+    "notes": "Accelerated 15-minute lightning strike density aggregates. Not individual flashes; not a GOES GLM point feed.",
+    "viewport": true,
+    "attribution": "NOAA nowCOAST / Vaisala"
+  },
+  {
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "▣",
+    "color": "#3bafaa",
+    "access": "integrated",
+    "motion": true,
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Reporting operator vehicles; coverage and service hours vary.",
+    "notes": "Only fresh GPS observations are displayed; no schedule-derived positions.",
+    "id": "denver-vehicles",
+    "name": "Denver RTD vehicles",
+    "source": "Regional Transportation District",
+    "region": "denver-vehicles",
+    "bounds": [
+      -106,
+      39,
+      -104,
+      41
+    ],
+    "adapter": "gtfs-rt",
+    "endpoint": "https://open-data.rtd-denver.com/files/gtfs-rt/rtd/VehiclePosition.pb",
+    "url": "https://www.rtd-denver.com/open-records/open-spatial-information/real-time-feeds",
+    "destination": {
+      "name": "Denver",
+      "country": "United States",
+      "timeZone": "America/Denver",
+      "center": [
+        39.74,
+        -104.99
+      ],
+      "zoom": 11
+    }
+  },
+  {
+    "group": "Motion",
+    "kind": "Live",
+    "icon": "▣",
+    "color": "#3bafaa",
+    "access": "integrated",
+    "motion": true,
+    "refresh": 20,
+    "maxAge": 300,
+    "coverage": "Reporting operator vehicles; coverage and service hours vary.",
+    "notes": "Only fresh GPS observations are displayed; no schedule-derived positions.",
+    "id": "lisbon-vehicles",
+    "name": "Lisbon metropolitan buses",
+    "source": "Carris Metropolitana",
+    "region": "lisbon-vehicles",
+    "bounds": [
+      -9.6,
+      38.3,
+      -8.5,
+      39.3
+    ],
+    "url": "https://github.com/carrismetropolitana/api",
+    "destination": {
+      "name": "Lisbon",
+      "country": "Portugal",
+      "timeZone": "Europe/Lisbon",
+      "center": [
+        38.72,
+        -9.14
+      ],
+      "zoom": 11
+    }
   }
 ]

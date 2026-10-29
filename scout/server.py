@@ -17,9 +17,17 @@ import gbfs
 import metro
 import finnish_ships
 import orbit
+import streamfeeds
+import satellites
+import discovery
+import lisbon
 ADAPTERS.update(SEATTLE_ADAPTERS)
 ADAPTERS['fi-ships']=finnish_ships.snapshot
 ADAPTERS['iss-orbit']=orbit.load
+ADAPTERS['fi-trains']=streamfeeds.TRAINS.snapshot
+ADAPTERS['balloons']=streamfeeds.BALLOONS.snapshot
+ADAPTERS['satellites']=satellites.load
+ADAPTERS['lisbon-vehicles']=lisbon.load
 ADAPTERS.update({'sea-ships':lambda:ships.snapshot('seattle'),'bay-ships':lambda:ships.snapshot('bay')})
 
 ROOT = Path(__file__).resolve().parent
@@ -44,6 +52,8 @@ def load_source(key):
             value=ADAPTERS[key]()
             if not isinstance(value.get('items'),list):raise ValueError('Invalid adapter output')
             if source.get('motion'):
+                for identifier,points in value.get('history',{}).items():
+                    remember_positions(key,[{**p,'id':identifier} for p in points])
                 value['history']=remember_positions(key,value['items'])
             response={**value,'id':key,'status':'partial' if value.get('partial') else 'ok','fetchedAt':int(time.time()*1000),'error':None}
             retry=time.time()+source['refresh']
@@ -64,8 +74,8 @@ def remember_positions(key,items):
         if not isinstance(t,(int,float)) or not now-600000<t<=now+60000:continue
         track=tracks.setdefault(item['id'],[])
         if not track or t>track[-1]['time']:
-            track.append({k:item[k] for k in ('lat','lon','time','heading') if k in item})
-        tracks[item['id']]=[p for p in track if p['time']>now-600000][-40:]
+            track.append({k:item[k] for k in ('lat','lon','time','heading','tripId','shapeId','routeDistance') if k in item})
+        tracks[item['id']]=[p for p in track if p['time']>now-600000][-600:]
     for identifier in list(tracks):
         if not tracks[identifier] or tracks[identifier][-1]['time']<now-300000:del tracks[identifier]
     if len(tracks)>5000:
@@ -79,7 +89,9 @@ class Handler(SimpleHTTPRequestHandler):
         path=urlsplit(self.path).path
         if path.startswith('/api/'):
             key=path[len('/api/'):]
-            if key.startswith('world-'):
+            if key=='discovery':
+                value=discovery.snapshot(SOURCES,load_source)
+            elif key.startswith('world-'):
                 if key[6:] not in world.KINDS:return self.send_error(404,'Unknown source')
                 try:bounds=world.parse_bounds(parse_qs(urlsplit(self.path).query).get('bbox',[''])[0])
                 except ValueError:return self.send_error(400,'Invalid bounding box')
@@ -97,7 +109,7 @@ class Handler(SimpleHTTPRequestHandler):
             try:self.wfile.write(data)
             except (BrokenPipeError,ConnectionResetError):pass
             return
-        if path not in {'/','/index.html','/app.js','/motion.js','/live.js','/explore.js','/style.css','/sources.json'}:
+        if path not in {'/','/index.html','/app.js','/motion.js','/live.js','/environment.js','/explore.js','/style.css','/sources.json'}:
             return self.send_error(404)
         super().do_GET()
     def end_headers(self):
@@ -119,4 +131,6 @@ if __name__=='__main__':
     except KeyboardInterrupt:pass
     finally:
         ships.STOP.set()
+        streamfeeds.TRAINS.stop.set()
+        streamfeeds.BALLOONS.stop.set()
         server.server_close()

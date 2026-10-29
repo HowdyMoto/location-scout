@@ -6,6 +6,7 @@ import urllib.request
 import csv
 import io
 import zipfile
+import routes
 import threading
 from google.transit import gtfs_realtime_pb2
 import feeds as f
@@ -65,7 +66,7 @@ def parse_transit(data,agency,route_labels=None):
   route_label=(route_labels or {}).get(route)
   route_text=f'Route {route_label}' if route_label else f'Route ID {route}'
   identifier=vehicle.get('id') or entity.get('id')
-  items.append(point(identifier,p.get('latitude'),p.get('longitude'),f"{agency}{' · '+route_label if route_label else ''} · {vehicle.get('label') or identifier}",f"{route_text} · {v.get('current_status','Status not supplied')} · stop ID {v.get('stop_id','unknown')}. Route IDs are provider identifiers, not necessarily the number on the vehicle. GPS observation, not a scheduled position.",t,summary=f'{agency} · {route_text}',heading=p.get('bearing'),routeLabel=route_label))
+  items.append(point(identifier,p.get('latitude'),p.get('longitude'),f"{agency}{' · '+route_label if route_label else ''} · {vehicle.get('label') or identifier}",f"{route_text} · {v.get('current_status','Status not supplied')} · stop ID {v.get('stop_id','unknown')}. Route IDs are provider identifiers, not necessarily the number on the vehicle. GPS observation, not a scheduled position.",t,summary=f'{agency} · {route_text}',heading=p.get('bearing'),routeLabel=route_label,tripId=trip.get('trip_id',trip.get('tripId')),routeId=route))
  return f.result(items,f'Actual reported vehicle locations; {omitted} old or untimestamped records omitted. Coverage varies by route and vehicle. No position extrapolation.')
 
 def transit(key):
@@ -79,7 +80,8 @@ def transit(key):
   message=gtfs_realtime_pb2.FeedMessage();message.ParseFromString(raw)
   if not message.HasField('header'):raise ValueError('Missing GTFS header')
   data=MessageToDict(message,preserving_proto_field_name=True)
- return parse_transit(data,agency,transit_route_labels(key) if key in ROUTE_URLS else None)
+ value=parse_transit(data,agency,transit_route_labels(key) if key in ROUTE_URLS else None)
+ return routes.enrich(value,ROUTE_URLS[key]) if key in ROUTE_URLS else value
 
 def ferries():
  key=os.environ.get('WSDOT_API_KEY')
