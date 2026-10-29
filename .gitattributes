@@ -1,0 +1,2 @@
+# Keep Bash launchers usable on Unix even when checked out on Windows.
+*.sh text eol=lf
